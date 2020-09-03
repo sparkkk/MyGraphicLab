@@ -1,0 +1,51 @@
+{
+  "version": "0.1",
+  "cameras": [
+    {
+      "type": "perspect",
+      "fan": 60,
+      "aspect": [800, 600],
+      "range": [10.0, 100.0],
+      "at": [0, 0, 20],
+      "look": [0, 0, 0],
+      "up": [0, 1, 0],
+      "flipY": false
+    }
+  ],
+  "renders": [
+    {
+      "path": "render1.json",
+      "follow": false,
+      "transforms": [
+        {
+          "type": "scale",
+          "value": ["20.0", "20.0", "20.0"]
+        },
+        {
+          "type": "rotate",
+          "value": ["* delta 30", "0", "1", "0"]
+        },
+        {
+          "type": "rotate",
+          "value": ["* delta 45", "1", "0", "0"]
+        }
+      ],
+      "uniforms": []
+    }
+  ],
+  "lights": [
+    {
+      "path": "light1.json",
+      "uniforms": []
+    },
+    {
+      "path": "light1.json",
+      "uniforms": [
+        {
+          "id": "Lights[n].Position",
+          "value": ["vec3", "0", "10", "0"]
+        }
+      ]
+    }
+  ]
+}

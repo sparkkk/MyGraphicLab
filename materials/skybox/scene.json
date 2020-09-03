@@ -1,0 +1,53 @@
+{
+  "version": "0.1",
+  "cameras": [
+    {
+      "type": "perspect",
+      "fan": 60,
+      "aspect": [800, 600],
+      "range": [1.0, 1000.0],
+      "at": [0, 0, 20],
+      "look": [0, 0, 0],
+      "up": [0, 1, 0],
+      "flipY": false
+    }
+  ],
+  "renders": [
+    {
+      "path": "skybox.json",
+      "follow": true,
+      "transforms": [
+        {
+          "type": "scale",
+          "value": ["20.0", "20.0", "20.0"]
+        }
+      ],
+      "uniforms": []
+    },
+    {
+      "path": "render1.json",
+      "follow": false,
+      "transforms": [
+        {
+          "type": "scale",
+          "value": ["20.0", "20.0", "20.0"]
+        },
+        {
+          "type": "rotate",
+          "value": ["* delta 30", "1", "0", "0"]
+        },
+        {
+          "type": "rotate",
+          "value": ["* delta 45", "0", "1", "0"]
+        }
+      ],
+      "uniforms": []
+    }
+  ],
+  "lights": [
+    {
+      "path": "light1.json",
+      "uniforms": []
+    }
+  ]
+}

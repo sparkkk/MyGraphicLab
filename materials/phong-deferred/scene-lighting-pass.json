@@ -1,0 +1,28 @@
+{
+  "version": "0.1",
+  "cameras": [
+    {
+      "type": "identity",
+      "fan": 0,
+      "aspect": [],
+      "range": [],
+      "at": [],
+      "look": [],
+      "up": [],
+      "flipY": false
+    }
+  ],
+  "renders": [
+    {
+      "path": "render-lighting-pass.json",
+      "transforms": [],
+      "uniforms": []
+    }
+  ],
+  "lights": [
+    {
+      "path": "light1.json",
+      "uniforms": []
+    }
+  ]
+}

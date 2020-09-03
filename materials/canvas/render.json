@@ -1,0 +1,27 @@
+{
+  "version": "0.1",
+  "options": {
+    "alphaBlend": false,
+    "depthTest": false,
+    "depthMask": false,
+    "cullMode": "back",
+    "drawMode": "list"
+  },
+  "shader": {
+    "type": "glsl",
+    "pathVert": "vert.glsl",
+    "pathFrag": "frag.glsl"
+  },
+  "mesh": {
+    "type": "obj",
+    "path": "../resource/quad.obj"
+  },
+  "material": {
+    "uniforms": [
+      {
+        "id": "Texture1",
+        "value": ["texture", "file", "../resource/castle.png", "RGB"]
+      }
+    ]
+  }
+}

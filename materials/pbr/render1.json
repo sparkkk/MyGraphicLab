@@ -1,0 +1,47 @@
+{
+  "version": "0.1",
+  "options": {
+    "alphaBlend": false,
+    "depthTest": true,
+    "depthMask": true,
+    "cullMode": "back",
+    "drawMode": "list"
+  },
+  "shader": {
+    "type": "glsl",
+    "pathVert": "vert.glsl",
+    "pathFrag": "frag.glsl"
+  },
+  "mesh": {
+    "type": "obj",
+    "path": "../resource/toad.obj"
+  },
+  "material": {
+    "uniforms": [
+      {
+        "id": "Material.TextureNormal",
+        "value": ["texture", "file", "../resource/Toad_Normal.png", "RGB"]
+      },
+      {
+        "id": "Material.TextureAlbedo",
+        "value": ["texture", "built-in", "gray"]
+      },
+      {
+        "id": "Material.TextureMetallic",
+        "value": ["texture", "rgb", "0.5", "0", "0"]
+      },
+      {
+        "id": "Material.TextureRoughness",
+        "value": ["texture", "rgb", "0.5", "0", "0"]
+      },
+      {
+        "id": "Material.TextureAmbientOcclusion",
+        "value": ["texture", "rgb", "0", "0", "0"]
+      },
+      {
+        "id": "Exposure",
+        "value": ["scalar", "1.5"]
+      }
+    ]
+  }
+}

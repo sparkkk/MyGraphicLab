@@ -1,0 +1,26 @@
+{
+  "version": "0.1",
+  "type": "point",
+  "uniforms": [
+    {
+      "id": "Lights[n].Position",
+      "value": ["vec3", "0", "0", "10"]
+    },
+    {
+      "id": "Lights[n].AmbientColor",
+      "value": ["vec3", "0.2", "0.2", "0.2"]
+    },
+    {
+      "id": "Lights[n].DiffuseColor",
+      "value": ["vec3", "0.6", "0.6", "0.6"]
+    },
+    {
+      "id": "Lights[n].SpecularColor",
+      "value": ["vec3", "4", "4", "4"]
+    },
+    {
+      "id": "Lights[n].Attenue",
+      "value": ["vec3", "1.0", "0.022", "0.0019"]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "version": "0.1",
+  "options": {
+    "alphaBlend": false,
+    "depthTest": true,
+    "depthMask": true,
+    "cullMode": "back",
+    "drawMode": "list"
+  },
+  "shader": {
+    "type": "glsl",
+    "pathVert": "render1.vert.glsl",
+    "pathFrag": "render1.frag.glsl"
+  },
+  "mesh": {
+    "type": "obj",
+    "path": "../resource/toad.obj"
+  },
+  "material": {
+    "uniforms": [
+      {
+        "id": "Material.TextureNormal",
+        "value": ["texture", "file", "../resource/Toad_Normal.png", "RGB"]
+      },
+      {
+        "id": "Material.TextureDiffuse",
+        "value": ["texture", "built-in", "white"]
+      },
+      {
+        "id": "Material.TextureSpecular",
+        "value": ["texture", "built-in", "white"]
+      },
+      {
+        "id": "Material.SpecularShiness",
+        "value": ["scalar", "64"]
+      },
+      {
+        "id": "TextureEnv",
+        "value": ["cubemap", "file", "../resource/skybox/skybox[f].png", "RGB"]
+      },
+      {
+        "id": "EnvTransform",
+        "value": ["mat4"]
+      }
+    ]
+  }
+}
