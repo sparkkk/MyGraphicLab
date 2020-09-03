@@ -44,10 +44,5 @@
       "uniforms": []
     }
   ],
-  "lights": [
-    {
-      "path": "light1.json",
-      "uniforms": []
-    }
-  ]
+  "lights": []
 }

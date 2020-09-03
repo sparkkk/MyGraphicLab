@@ -3,15 +3,15 @@
   "type": "point",
   "uniforms": [
     {
-      "id": "Lights[n].Position",
+      "id": "Light.Lights[n].Position",
       "value": ["vec3", "0", "0", "10"]
     },
     {
-      "id": "Lights[n].Color",
+      "id": "Light.Lights[n].Color",
       "value": ["vec3", "5.0", "5.0", "5.0"]
     },
     {
-      "id": "Lights[n].Attenue",
+      "id": "Light.Attenue",
       "value": ["vec3", "1.0", "0.022", "0.0019"]
     }
   ]

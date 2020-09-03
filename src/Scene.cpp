@@ -38,7 +38,7 @@ void Scene::setup()
 		render.setParam("PositionTransform", mvp);
 		render.setParam("WorldTransform", transform);
 		render.setParam("ViewerPosition", camera.position);
-		render.setParam("LightCount", (int) lights.size());
+		render.setParam("Light.LightCount", (int) lights.size());
 
 		for (int i = 0; i < lights.size(); ++i)
 		{

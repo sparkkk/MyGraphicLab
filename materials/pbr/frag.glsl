@@ -14,17 +14,23 @@ struct MaterialParam
     sampler2D TextureAmbientOcclusion;
 };
 
-struct LightParam
+struct PointLightParam
 {
     vec3 Position;
     vec3 Color;
+};
+
+struct LightParam
+{
+    int LightCount;
+    PointLightParam Lights[4];
     vec3 Attenue;
 };
 
 uniform MaterialParam Material;
 
-uniform int LightCount;
-uniform LightParam Lights[4];
+
+uniform LightParam Light;
 
 uniform float Exposure;
 
@@ -46,6 +52,8 @@ void main()
     float roughness = texture(Material.TextureRoughness, vCoord).x;
     float ambientOcclusion = texture(Material.TextureAmbientOcclusion, vCoord).x;
 
+    vec3 LightAttenue = Light.Attenue;
+
     vec3 N = normalize(texture(Material.TextureNormal, vCoord).xyz * 2.0 - 1.0);
     vec3 V = normalize(vViewerPosition - vWorldPosition);
     
@@ -53,11 +61,10 @@ void main()
     F0 = mix(F0, albedo, metallic);
 
     vec3 Lo = vec3(0.0);
-    for (int i = 0; i < LightCount; ++i)
+    for (int i = 0; i < Light.LightCount; ++i)
     {
-        vec3 LightPosition = vTBN * Lights[i].Position;
-        vec3 LightColor = Lights[i].Color;
-        vec3 LightAttenue = Lights[i].Attenue;
+        vec3 LightPosition = vTBN * Light.Lights[i].Position;
+        vec3 LightColor = Light.Lights[i].Color;
 
         vec3 L = normalize(LightPosition - vWorldPosition);
         vec3 H = normalize(V + L);

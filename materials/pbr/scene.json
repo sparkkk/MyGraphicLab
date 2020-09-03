@@ -42,7 +42,7 @@
       "path": "light1.json",
       "uniforms": [
         {
-          "id": "Lights[n].Position",
+          "id": "Light.Lights[n].Position",
           "value": ["vec3", "0", "10", "0"]
         }
       ]
