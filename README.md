@@ -1,9 +1,10 @@
 # MyGraphicLab
 
+## Prepare
+
+Install glfw3, glew, glm, nlohamn json
+
 ## Build for the first time
-`cd MyGraphicLab`  
-`git submodule init`  
-`git submodule update`  
 `mkdir build`  
 `cd build`  
 `cmake ..`  
