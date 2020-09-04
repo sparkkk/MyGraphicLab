@@ -23,7 +23,7 @@ void sunty::SimpleForwardDrawer::init(const Config & config)
 
 	DescLoader loader;
 	if (!loader.loadScene(
-		"../materials/skybox/scene.json",
+		"../materials/blinn-phong/scene.json",
 		mScene
 	))
 	{
