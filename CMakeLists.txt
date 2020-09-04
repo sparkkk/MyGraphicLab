@@ -17,13 +17,21 @@ include_directories(
 
 add_compile_options(-std=c++17 -g -O0)
 
+include_directories(
+    "${MY_LOCAL_PATH}/include"
+)
+
+link_directories(
+    "${MY_LOCAL_PATH}/lib"
+)
+
 add_executable(MyGraphicLab ${source_files})
 
 if (APPLE)
 
 target_link_libraries(
     MyGraphicLab
-    glfw3
+    glfw
     GLEW
     "-framework Foundation"
     "-framework OpenGL"
