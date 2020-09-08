@@ -110,13 +110,11 @@ bool sunty::SimpleObjLoader::load(
 		std::getline(stream, line);
 		if (line[0] == '#')
 		{
-			std::getline(stream, line);
 			continue;
 		}
 		std::vector<std::string> splits = split(line, " ");
 		if (splits.size() == 0)
 		{
-			std::getline(stream, line);
 			continue;
 		}
 		auto & head = splits[0];
