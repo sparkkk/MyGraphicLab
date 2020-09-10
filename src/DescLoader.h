@@ -12,17 +12,23 @@ namespace sunty
 		~DescLoader();
 
 		bool loadRenderObject(
-			const char * path,
+			const std::filesystem::path & path,
 			RenderObject & render
 		);
 		bool loadLight(
-			const char * path,
+			const std::filesystem::path & path,
 			Scene::Light & light
 		);
 		bool loadScene(
-			const char * path,
+			const std::filesystem::path & path,
 			Scene & scene
 		);
+		bool loadStarter(
+			const std::filesystem::path & path,
+			std::string & scenePath
+		);
+		std::filesystem::path assembllyPath(const std::filesystem::path & path);
+		std::vector<std::filesystem::path> searchPaths;
 	};
 
 }

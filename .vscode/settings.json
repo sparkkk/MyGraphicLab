@@ -75,6 +75,17 @@
         "__errc": "cpp",
         "__node_handle": "cpp",
         "bit": "cpp",
-        "optional": "cpp"
+        "optional": "cpp",
+        "*.tcc": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "csignal": "cpp",
+        "memory_resource": "cpp",
+        "random": "cpp",
+        "ranges": "cpp",
+        "shared_mutex": "cpp",
+        "stop_token": "cpp",
+        "cinttypes": "cpp",
+        "queue": "cpp"
     }
 }

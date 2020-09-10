@@ -15,7 +15,6 @@
   "renders": [
     {
       "path": "render.json",
-      "follow": false,
       "transforms": [],
       "uniforms": []
     }

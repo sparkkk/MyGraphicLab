@@ -21,14 +21,14 @@ void sunty::SimpleDeferredDrawer::init(const Config & config)
 
 	DescLoader loader;
 	if (!loader.loadScene(
-		"../materials/phong-deferred/scene-geometry-pass.json",
+		"materials/phong-deferred/scene-geometry-pass.json",
 		mGeometryPassScene
 	))
 	{
 		printf("failed to load geometry scene\n");
 	}
 	if (!loader.loadScene(
-		"../materials/phong-deferred/scene-lighting-pass.json",
+		"materials/phong-deferred/scene-lighting-pass.json",
 		mLightingPassScene
 	))
 	{

@@ -14,6 +14,7 @@
 #include <fstream>
 #include <functional>
 #include <chrono>
+#include <filesystem>
 
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/type_ptr.hpp"

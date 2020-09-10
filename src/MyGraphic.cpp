@@ -74,8 +74,9 @@ protected:
 		mDrawer->init(config);
 
 		DescLoader loader;
+		loader.searchPaths.emplace_back("../materials");
 		loader.loadScene(
-			"../materials/canvas/scene.json",
+			"canvas/scene.json",
 			mCanvasScene
 		);
 		//auto ttt = std::make_shared<Texture>();

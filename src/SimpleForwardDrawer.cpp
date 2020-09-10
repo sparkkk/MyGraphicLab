@@ -22,12 +22,17 @@ void sunty::SimpleForwardDrawer::init(const Config & config)
 	float aspect = (float) config.width / (float) config.height;
 
 	DescLoader loader;
-	if (!loader.loadScene(
-		"../materials/blinn-phong/scene.json",
-		mScene
-	))
+	std::string scenePath;
+	if (!loader.loadStarter("../starter.json", scenePath))
+	{
+		printf("failed to load starter\n");
+		return;
+	}
+	loader.searchPaths.emplace_back("../materials");
+	if (!loader.loadScene(scenePath.c_str(), mScene))
 	{
 		printf("failed to load scene\n");
+		return;
 	}
 
 	RenderTarget::Options canvasOptions;

@@ -14,13 +14,13 @@
   },
   "mesh": {
     "type": "obj",
-    "path": "../resource/quad.obj"
+    "path": "resource/quad.obj"
   },
   "material": {
     "uniforms": [
       {
         "id": "Texture1",
-        "value": ["texture", "file", "../resource/castle.png", "RGB"]
+        "value": ["texture", "file", "resource/castle.png", "RGB"]
       }
     ]
   }

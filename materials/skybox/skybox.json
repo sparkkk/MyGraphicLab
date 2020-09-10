@@ -14,13 +14,13 @@
     },
     "mesh": {
       "type": "obj",
-      "path": "../resource/cube.obj"
+      "path": "resource/cube.obj"
     },
     "material": {
       "uniforms": [
         {
           "id": "TextureCube",
-          "value": ["cubemap", "file", "../resource/skybox/skybox[f].png", "RGB"]
+          "value": ["cubemap", "file", "resource/skybox/skybox[f].png", "RGB"]
         }
       ]
     }

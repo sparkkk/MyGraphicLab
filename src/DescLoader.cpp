@@ -10,18 +10,17 @@ DescLoader::DescLoader()
 {
 }
 
-
 DescLoader::~DescLoader()
 {
 }
 
-#define JD_FROM_JSON(name) j.at(#name).get_to(jd.name)
+#define JD_FROM_JSON(name) if (j.contains(#name)) { j.at(#name).get_to(jd.name); }
 
 struct JDRenderOptions
 {
-    bool alphaBlend;
-    bool depthTest;
-    bool depthMask;
+    bool alphaBlend = false;
+    bool depthTest = false;
+    bool depthMask = false;
     std::string cullMode;
     std::string drawMode;
 };
@@ -117,13 +116,13 @@ void from_json(const json& j, JDLight& jd)
 struct JDCameraItem
 {
     std::string type;
-    float fan;
+    float fan = 0;
     std::vector<float> aspect;
     std::vector<float> range;
     std::vector<float> at;
     std::vector<float> look;
     std::vector<float> up;
-    bool flipY;
+    bool flipY = false;
 };
 
 void from_json(const json& j, JDCameraItem& jd)
@@ -153,7 +152,7 @@ void from_json(const json& j, JDTransformItem& jd)
 struct JDRenderItem
 {
     std::string path;
-    bool follow;
+    bool follow = false;
     std::vector<JDTransformItem> transforms;
     std::vector<JDUniformItem> uniforms;
 };
@@ -194,7 +193,7 @@ void from_json(const json& j, JDScene& jd)
     JD_FROM_JSON(lights);
 }
 
-static bool loadFile(const std::string & path, std::string & text)
+static bool loadFile(const std::filesystem::path & path, std::string & text)
 {
     std::ifstream stream;
     stream.open(path);
@@ -211,40 +210,9 @@ static bool loadFile(const std::string & path, std::string & text)
     return true;
 }
 
-static std::string processPath(const std::string & path)
-{
-#if WIN32 || WIN64
-    auto res = path;
-    for (size_t i = 0; i < res.size(); ++i)
-    {
-        if (res[i] == '/')
-        {
-            res[i] = '\\';
-        }
-    }
-    return res;
-#else
-    return path;
-#endif
-}
-
-static std::string getDir(const std::string & path)
-{
-#if WIN32 || WIN64
-    auto sepPos = path.rfind('\\');
-#else
-    auto sepPos = path.rfind('/');
-#endif
-    if (sepPos == std::string::npos)
-    {
-        return "";
-    }
-    return path.substr(0, sepPos + 1);
-}
-
 struct ParseContext
 {
-    std::string dirPath;
+    DescLoader * loader = nullptr;
     RenderOptions options;
     std::shared_ptr<Shader> shader;
     std::shared_ptr<VertexBufferObject> vbo;
@@ -283,11 +251,11 @@ static bool parseShader(ParseContext & context, const JDShader & jd)
 {
     context.shader = std::make_shared<Shader>();
     std::string vertCode, fragCode;
-    if (!loadFile(context.dirPath + processPath(jd.pathVert), vertCode))
+    if (!loadFile(context.loader->assembllyPath(jd.pathVert), vertCode))
     {
         return false;
     }
-    if (!loadFile(context.dirPath + processPath(jd.pathFrag), fragCode))
+    if (!loadFile(context.loader->assembllyPath(jd.pathFrag), fragCode))
     {
         return false;
     }
@@ -303,7 +271,7 @@ static bool parseMesh(ParseContext & context, const JDMesh & jd)
     {
         SimpleObjLoader loader;
         loader.load(
-            (context.dirPath + processPath(jd.path)).c_str(),
+            context.loader->assembllyPath(jd.path),
             true,
             *context.vbo,
             *context.vao
@@ -332,7 +300,7 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
                 if (type == "file")
                 {
                     if (!loadPngTexture(
-                        (context.dirPath + processPath(list[2])).c_str(),
+                        context.loader->assembllyPath(list[2]),
                         list[3].c_str(),
                         *texture
                     ))
@@ -454,7 +422,7 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
                 if (type == "file")
                 {
                     if (!loadPngCubemap(
-                        (context.dirPath + processPath(list[2])).c_str(),
+                        context.loader->assembllyPath(list[2]),
                         list[3].c_str(),
                         *cubemap
                     ))
@@ -654,11 +622,8 @@ static bool parseRenderItem(ParseContext & context, const JDRenderItem & jd)
     context.renders.emplace_back();
     context.transforms.emplace_back();
     context.follows.emplace_back(jd.follow);
-    DescLoader loader;
-    if (!loader.loadRenderObject(
-        (context.dirPath + jd.path).c_str(),
-        context.renders.back()
-    ))
+    DescLoader& loader = *context.loader;
+    if (!loader.loadRenderObject(jd.path, context.renders.back()))
     {
         return false;
     }
@@ -682,11 +647,8 @@ static bool parseRenderItem(ParseContext & context, const JDRenderItem & jd)
 static bool parseLightItem(ParseContext & context, const JDLightItem & jd)
 {
     context.lights.emplace_back();
-    DescLoader loader;
-    if (!loader.loadLight(
-        (context.dirPath + jd.path).c_str(),
-        context.lights.back()
-    ))
+    DescLoader& loader = *context.loader;
+    if (!loader.loadLight(jd.path, context.lights.back()))
     {
         return false;
     }
@@ -702,17 +664,22 @@ static bool parseLightItem(ParseContext & context, const JDLightItem & jd)
 }
 
 
-bool sunty::DescLoader::loadRenderObject(const char * path, RenderObject & render)
+bool sunty::DescLoader::loadRenderObject(
+	const std::filesystem::path & path,
+    RenderObject & render)
 {
-    std::ifstream streamIn(path);
+    auto asbPath = assembllyPath(path);
+    std::ifstream streamIn(asbPath);
     if (!streamIn.is_open())
     {
         return false;
     }
+
+    searchPaths.emplace_back(asbPath.parent_path());
     
     ParseContext context;
 
-    context.dirPath = getDir(path);
+    context.loader = this;
 
     json jsonRender;
 
@@ -753,21 +720,28 @@ bool sunty::DescLoader::loadRenderObject(const char * path, RenderObject & rende
         auto & val = entry.second;
         render.setParam(id.c_str(), val);
     }
+
+    searchPaths.pop_back();
     
     return true;
 }
 
-bool sunty::DescLoader::loadLight(const char * path, Scene::Light & light)
+bool sunty::DescLoader::loadLight(
+	const std::filesystem::path & path,
+    Scene::Light & light)
 {
-    std::ifstream streamIn(path);
+    auto asbPath = assembllyPath(path);
+    std::ifstream streamIn(asbPath);
     if (!streamIn.is_open())
     {
         return false;
     }
 
+    searchPaths.emplace_back(asbPath.parent_path());
+
     ParseContext context;
 
-    context.dirPath = getDir(path);
+    context.loader = this;
 
     json json;
 
@@ -794,20 +768,26 @@ bool sunty::DescLoader::loadLight(const char * path, Scene::Light & light)
 
     light.uniforms = std::move(context.uniforms);
 
+    searchPaths.pop_back();
     return true;
 }
 
-bool sunty::DescLoader::loadScene(const char * path, Scene & scene)
+bool sunty::DescLoader::loadScene(
+	const std::filesystem::path & path,
+    Scene & scene)
 {
-    std::ifstream streamIn(path);
+    auto asbPath = assembllyPath(path);
+    std::ifstream streamIn(asbPath);
     if (!streamIn.is_open())
     {
         return false;
     }
 
+    searchPaths.emplace_back(asbPath.parent_path());
+
     ParseContext context;
 
-    context.dirPath = getDir(path);
+    context.loader = this;
 
     json json;
 
@@ -859,5 +839,60 @@ bool sunty::DescLoader::loadScene(const char * path, Scene & scene)
 
     scene.setup();
 
+    searchPaths.pop_back();
+
     return true;
+}
+
+struct JDStarter
+{
+    std::string version;
+    std::string path;
+};
+
+bool DescLoader::loadStarter(
+	const std::filesystem::path & path,
+    std::string & scenePath)
+{
+    std::ifstream streamIn(path);
+    if (!streamIn.is_open())
+    {
+        return false;
+    }
+    json j;
+    JDStarter jd;
+    streamIn >> j;
+    JD_FROM_JSON(version);
+    JD_FROM_JSON(path);
+
+    scenePath = jd.path;
+    return true;
+}
+
+
+std::filesystem::path DescLoader::assembllyPath(const std::filesystem::path & path)
+{
+    for (int k = searchPaths.size() - 1; k >= 0; --k)
+    {
+        auto & sp = searchPaths[k];
+        auto ap = sp / path;
+        ap = ap.lexically_normal();
+        auto repos = ap.string().find("[f]");
+        if (repos != std::string::npos)
+        {
+            std::string repStr = ap.string().replace(repos, 3, "-pos-x");
+            if (std::filesystem::exists(repStr))
+            {
+                return ap;
+            }
+        }
+        else
+        {
+            if (std::filesystem::exists(ap))
+            {
+                return ap;
+            }
+        }
+    }
+    return path;
 }

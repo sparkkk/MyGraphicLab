@@ -20,7 +20,7 @@ static std::vector<uint8_t> flipImage(const std::vector<uint8_t> & image, int st
     return flip;
 }
 
-bool loadPngTexture(const char * path, const char * pixelFormat, Texture & tex)
+bool loadPngTexture(const std::filesystem::path & path, const char * pixelFormat, Texture & tex)
 {
     LodePNGColorType colorType = LodePNGColorType::LCT_RGB;
     Texture::PixelLayout pixelLayout = Texture::PL_RGB;
@@ -48,7 +48,7 @@ bool loadPngTexture(const char * path, const char * pixelFormat, Texture & tex)
         image,
         imageW,
         imageH,
-        path,
+        path.string(),
         colorType,
         8U
     );
@@ -70,7 +70,7 @@ bool loadPngTexture(const char * path, const char * pixelFormat, Texture & tex)
     return true;
 }
 
-bool loadPngCubemap(const char * path, const char * pixelFormat, Cubemap & cubemap)
+bool loadPngCubemap(const std::filesystem::path & path, const char * pixelFormat, Cubemap & cubemap)
 {
     const char * suffixes[] = {
         "-pos-x",
@@ -108,8 +108,8 @@ bool loadPngCubemap(const char * path, const char * pixelFormat, Cubemap & cubem
     std::vector<uint8_t> faceImages[6];
     for (int i = 0; i < 6; ++i)
     {
-        std::string facePath = path;
-        facePath = facePath.replace(facePath.find("[f]"), 3, suffixes[i]);
+        std::string pathStr = path.string();
+        std::filesystem::path facePath = pathStr.replace(pathStr.find("[f]"), 3, suffixes[i]);
 
         std::vector<uint8_t> & image = faceImages[i];
         uint32_t imageW, imageH;
@@ -118,12 +118,13 @@ bool loadPngCubemap(const char * path, const char * pixelFormat, Cubemap & cubem
             image,
             imageW,
             imageH,
-            facePath,
+            facePath.string(),
             colorType,
             8U
         );
         if (err != 0)
         {
+            printf("cubemap face decode failed: %s\n", facePath.string().c_str());
             return false;
         }
         image = std::move(flipImage(image, pixelSize * imageW, imageH));

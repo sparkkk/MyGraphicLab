@@ -73,7 +73,7 @@ static glm::vec3 _calcTangent(
 }
 
 bool sunty::SimpleObjLoader::load(
-	const char * path,
+	const std::filesystem::path & path,
 	bool calcTangent,
 	VertexBufferObject & vbo, 
 	VertexArrayObject & vao)
@@ -268,6 +268,6 @@ bool sunty::SimpleObjLoader::load(
 		(int *)faces.data()
 	);
 	vao.setup();
-	printf("obj model %s loaded successfully\n", path);
+	printf("obj model %s loaded successfully\n", path.string().c_str());
 	return true;
 }

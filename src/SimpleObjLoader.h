@@ -12,7 +12,7 @@ namespace sunty
 		SimpleObjLoader();
 		~SimpleObjLoader();
 		bool load(
-			const char * path,
+			const std::filesystem::path & path,
 			bool calcTangent,
 			VertexBufferObject & vbo,
 			VertexArrayObject & vao
