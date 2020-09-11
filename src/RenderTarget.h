@@ -38,6 +38,10 @@ namespace sunty
 		{
 			return mTextures;
 		}
+		std::shared_ptr<Texture> texture(int index)
+		{
+			return mTextures[index];
+		}
 		Options & options()
 		{
 			return mOptions;

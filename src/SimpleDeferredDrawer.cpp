@@ -20,15 +20,16 @@ void sunty::SimpleDeferredDrawer::init(const Config & config)
 	float aspect = (float)config.width / (float)config.height;
 
 	DescLoader loader;
+	loader.searchPaths.emplace_back("../materials");
 	if (!loader.loadScene(
-		"materials/phong-deferred/scene-geometry-pass.json",
+		"phong-deferred/scene-geometry-pass.json",
 		mGeometryPassScene
 	))
 	{
 		printf("failed to load geometry scene\n");
 	}
 	if (!loader.loadScene(
-		"materials/phong-deferred/scene-lighting-pass.json",
+		"phong-deferred/scene-lighting-pass.json",
 		mLightingPassScene
 	))
 	{
@@ -50,7 +51,7 @@ void sunty::SimpleDeferredDrawer::init(const Config & config)
 	GPRTOption.viewY = 0;
 	GPRTOption.viewW = width;
 	GPRTOption.viewH = height;
-	GPRTOption.clearColor = glm::vec4(0, 0, 0, 0);
+	GPRTOption.clearColor = glm::vec4(0, 0, 1, 0);
 	GPRTOption.clearDepth = 1;
 	GPRTOption.hasDepth = true;
 	GPRTOption.depthOption.width = width;
@@ -83,12 +84,12 @@ void sunty::SimpleDeferredDrawer::init(const Config & config)
 
 
 	mLightingPassScene.renders.back().setParam("ViewerPosition", mGeometryPassScene.cameras.back().position);
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureWorldPosition", mGeometryPassRT->textures()[0]);
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureNormal", mGeometryPassRT->textures()[1]);
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureTangent", mGeometryPassRT->textures()[2]);
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureNormalMap", mGeometryPassRT->textures()[3]);
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureDiffuseMap", mGeometryPassRT->textures()[4]);
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureSpecularMap", mGeometryPassRT->textures()[5]);
+	mLightingPassScene.renders.back().setParam("GBuffer.TextureWorldPosition", mGeometryPassRT->texture(0));
+	mLightingPassScene.renders.back().setParam("GBuffer.TextureNormal", mGeometryPassRT->texture(1));
+	mLightingPassScene.renders.back().setParam("GBuffer.TextureTangent", mGeometryPassRT->texture(2));
+	mLightingPassScene.renders.back().setParam("GBuffer.TextureNormalMap", mGeometryPassRT->texture(3));
+	mLightingPassScene.renders.back().setParam("GBuffer.TextureDiffuseMap", mGeometryPassRT->texture(4));
+	mLightingPassScene.renders.back().setParam("GBuffer.TextureSpecularMap", mGeometryPassRT->texture(5));
 }
 
 void SimpleDeferredDrawer::update(float delta)

@@ -14,7 +14,7 @@
   },
   "mesh": {
     "type": "obj",
-    "path": "../resource/quad.obj"
+    "path": "resource/quad.obj"
   },
   "material": {
     "uniforms": [

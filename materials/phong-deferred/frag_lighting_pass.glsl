@@ -15,15 +15,6 @@ struct GBufferParam
 
 uniform GBufferParam GBuffer;
 
-struct LightParam
-{
-    vec3 Position;
-    vec3 AmbientColor;
-    vec3 DiffuseColor;
-    vec3 SpecularColor;
-    vec3 Attenue;
-};
-
 struct MaterialParam
 {
     float SpecularShiness;
@@ -31,8 +22,22 @@ struct MaterialParam
 
 uniform MaterialParam Material;
 
-uniform int LightCount;
-uniform LightParam Lights[4];
+struct PointLightParam
+{
+    vec3 Position;
+    vec3 DiffuseColor;
+    vec3 SpecularColor;
+};
+
+struct LightParam
+{
+    int LightCount;
+    PointLightParam Lights[4];
+    vec3 AmbientColor;
+    vec3 Attenue;
+};
+
+uniform LightParam Light;
 
 layout (location = 0) out vec4 gColor;
 
@@ -55,14 +60,14 @@ void main()
 
     vec3 viewerVec = normalize(viewerPosition - worldPosition);
 
+    vec3 LightAmbientColor = Light.AmbientColor;
+    vec3 LightAttenue = Light.Attenue;
     vec3 color = vec3(0.0);
-    for (int i = 0; i < LightCount; ++i)
+    for (int i = 0; i < Light.LightCount; ++i)
     {
-        vec3 LightPosition = Lights[i].Position;
-        vec3 LightAmbientColor = Lights[i].AmbientColor;
-        vec3 LightDiffuseColor = Lights[i].DiffuseColor;
-        vec3 LightSpecularColor = Lights[i].SpecularColor;
-        vec3 LightAttenue = Lights[i].Attenue;
+        vec3 LightPosition = Light.Lights[i].Position;
+        vec3 LightDiffuseColor = Light.Lights[i].DiffuseColor;
+        vec3 LightSpecularColor = Light.Lights[i].SpecularColor;
 
         LightPosition = TBN * LightPosition;
 
@@ -74,11 +79,13 @@ void main()
         float dist = length(LightPosition - worldPosition);
         float attenuation = 1.0 / (LightAttenue.x + LightAttenue.y * dist + LightAttenue.z * dist * dist);
 
-        vec3 ambient = LightAmbientColor * diffuse;
         vec3 diffuse = cosLightNormal * LightDiffuseColor * diffuse;
         vec3 specular = spec * LightSpecularColor * specular;
 
-        color += (ambient + diffuse + specular) * attenuation;
+        color += (diffuse + specular) * attenuation;
     }
+    vec3 ambient = LightAmbientColor * diffuse;
+    color += ambient;
+    color = clamp(color, 0.0, 1.0);
     gColor = vec4(clamp(color, 0.0, 1.0), 1.0);
 }
