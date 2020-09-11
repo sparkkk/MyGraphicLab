@@ -39,7 +39,7 @@ namespace sunty
 		std::unordered_map<std::string, float> valueMap;
 		std::vector<glm::mat4> matrices;
 		std::vector<Light> lights;
-		int currentCameraIndex = 0;
 		std::vector<bool> follows;
+		Pass pass = PASS_DEFAULT;
 	};
 }

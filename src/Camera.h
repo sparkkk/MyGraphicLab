@@ -18,6 +18,7 @@ namespace sunty
 		glm::mat4 getP() { return mMatProj; }
 		glm::vec3 position;
 		bool flipY;
+		Pass pass = PASS_DEFAULT;
 	private:
 		glm::mat4 mMatView;
 		glm::mat4 mMatProj;

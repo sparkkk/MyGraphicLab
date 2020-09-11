@@ -5,6 +5,7 @@ struct MaterialParam
     sampler2D TextureDiffuse;
     sampler2D TextureSpecular;
     sampler2D TextureNormal;
+    float SpecularShiness;
 };
 
 uniform MaterialParam Material;
@@ -28,5 +29,5 @@ void main()
     gTangent = vec4(normalize(vTangent), 1.0);
     gNormalMap = texture(Material.TextureNormal, vCoord);
     gDiffuseMap = texture(Material.TextureDiffuse, vCoord);
-    gSpecularMap = texture(Material.TextureSpecular, vCoord);
+    gSpecularMap = vec4(texture(Material.TextureSpecular, vCoord).rgb, Material.SpecularShiness);
 }

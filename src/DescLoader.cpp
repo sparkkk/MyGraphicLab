@@ -14,6 +14,13 @@ DescLoader::~DescLoader()
 {
 }
 
+static std::map<std::string, Pass> sPassMap =
+{
+    { "default", PASS_DEFAULT },
+    { "geometry", PASS_GEOMETRY },
+    { "lighting", PASS_LIGHTING },
+};
+
 #define JD_FROM_JSON(name) if (j.contains(#name)) { j.at(#name).get_to(jd.name); }
 
 struct JDRenderOptions
@@ -116,6 +123,7 @@ void from_json(const json& j, JDLight& jd)
 struct JDCameraItem
 {
     std::string type;
+    std::string pass = "default";
     float fan = 0;
     std::vector<float> aspect;
     std::vector<float> range;
@@ -128,6 +136,7 @@ struct JDCameraItem
 void from_json(const json& j, JDCameraItem& jd)
 {
     JD_FROM_JSON(type);
+    JD_FROM_JSON(pass);
     JD_FROM_JSON(fan);
     JD_FROM_JSON(aspect);
     JD_FROM_JSON(range);
@@ -152,6 +161,7 @@ void from_json(const json& j, JDTransformItem& jd)
 struct JDRenderItem
 {
     std::string path;
+    std::string pass = "default";
     bool follow = false;
     std::vector<JDTransformItem> transforms;
     std::vector<JDUniformItem> uniforms;
@@ -160,6 +170,7 @@ struct JDRenderItem
 void from_json(const json& j, JDRenderItem& jd)
 {
     JD_FROM_JSON(path);
+    JD_FROM_JSON(pass);
     JD_FROM_JSON(follow);
     JD_FROM_JSON(transforms);
     JD_FROM_JSON(uniforms);
@@ -543,6 +554,7 @@ static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
             glm::vec3(jd.up[0], jd.up[1], jd.up[2])
         );
         context.cameras.back().flipY = jd.flipY;
+        context.cameras.back().pass = sPassMap[jd.pass];
         return true;
     }
     else if (jd.type == "ortho")
@@ -560,12 +572,14 @@ static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
             glm::vec3(jd.up[0], jd.up[1], jd.up[2])
         );
         context.cameras.back().flipY = jd.flipY;
+        context.cameras.back().pass = sPassMap[jd.pass];
         return true;
     }
     else if (jd.type == "identity")
     {
         context.cameras.emplace_back();
         context.cameras.back().flipY = jd.flipY;
+        context.cameras.back().pass = sPassMap[jd.pass];
         return true;
     }
     else
@@ -627,6 +641,7 @@ static bool parseRenderItem(ParseContext & context, const JDRenderItem & jd)
     {
         return false;
     }
+    context.renders.back().pass = sPassMap[jd.pass];
     for (auto & item : jd.transforms)
     {
         if (!parseTransformItem(context, item))

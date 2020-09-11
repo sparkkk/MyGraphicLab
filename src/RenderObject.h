@@ -65,13 +65,13 @@ namespace sunty
 		bool setParam(const char * name, const UniformValue & value);
 		void draw();
 		void release();
+		Pass pass = PASS_DEFAULT;
 	private:
 		std::shared_ptr<VertexBufferObject> mVBO;
 		std::shared_ptr<VertexArrayObject> mVAO;
 		std::unordered_map<std::string, UniformValue> mParams;
 		std::shared_ptr<Shader> mShader;
 		RenderOptions mOptions;
-
 	};
 }
 

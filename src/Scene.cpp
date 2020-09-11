@@ -15,8 +15,23 @@ void Scene::setup()
 {
 	update(0);
 
+	Camera * pCamera = nullptr;
+
+	for (auto & c : cameras)
+	{
+		if (c.pass == pass)
+		{
+			pCamera = &c;
+			break;
+		}
+	}
+	if (pCamera == nullptr)
+	{
+		return;
+	}
+
 	auto flipper = glm::mat4(1.0);
-	auto & camera = cameras[currentCameraIndex];
+	auto & camera = *pCamera;
 	if (camera.flipY)
 	{
 		flipper = glm::scale(glm::mat4(1.0), glm::vec3(1, -1, 1));
@@ -25,6 +40,10 @@ void Scene::setup()
 	for (int k = 0; k < renders.size(); ++k)
 	{
 		auto & render = renders[k];
+		if (render.pass != pass)
+		{
+			continue;
+		}
 		auto & transform = matrices[k];
 		bool follow = follows[k];
 
@@ -139,8 +158,23 @@ void Scene::update(float delta)
 		matrices.emplace_back(transformMat);
 	}
 
+	Camera * pCamera = nullptr;
+
+	for (auto & c : cameras)
+	{
+		if (c.pass == pass)
+		{
+			pCamera = &c;
+			break;
+		}
+	}
+	if (pCamera == nullptr)
+	{
+		return;
+	}
+
 	auto flipper = glm::mat4(1.0);
-	auto & camera = cameras[currentCameraIndex];
+	auto & camera = *pCamera;
 	if (camera.flipY)
 	{
 		flipper = glm::scale(glm::mat4(1.0), glm::vec3(1, -1, 1));
@@ -149,6 +183,10 @@ void Scene::update(float delta)
 	for (int k = 0; k < renders.size(); ++k)
 	{
 		auto & render = renders[k];
+		if (render.pass != pass)
+		{
+			continue;
+		}
 		auto & transform = matrices[k];
 		bool follow = follows[k];
 
@@ -167,6 +205,10 @@ void Scene::draw()
 {
 	for (auto & render : renders)
 	{
+		if (render.pass != pass)
+		{
+			continue;
+		}
 		render.draw();
 	}
 }

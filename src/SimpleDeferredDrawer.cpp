@@ -17,24 +17,17 @@ void sunty::SimpleDeferredDrawer::init(const Config & config)
 {
 	int width = config.width;
 	int height = config.height;
-	float aspect = (float)config.width / (float)config.height;
 
 	DescLoader loader;
 	loader.searchPaths.emplace_back("../materials");
-	if (!loader.loadScene(
-		"phong-deferred/scene-geometry-pass.json",
-		mGeometryPassScene
-	))
+	if (!loader.loadScene("phong-deferred/scene.json", mScene))
 	{
-		printf("failed to load geometry scene\n");
+		printf("failed to load scene\n");
 	}
-	if (!loader.loadScene(
-		"phong-deferred/scene-lighting-pass.json",
-		mLightingPassScene
-	))
-	{
-		printf("failed to load lighting scene\n");
-	}
+	mScene.pass = PASS_GEOMETRY;
+	mScene.setup();
+	mScene.pass = PASS_LIGHTING;
+	mScene.setup();
 
 	RenderTarget::Options GPRTOption;
 	GPRTOption.externalFBO = false;
@@ -51,7 +44,7 @@ void sunty::SimpleDeferredDrawer::init(const Config & config)
 	GPRTOption.viewY = 0;
 	GPRTOption.viewW = width;
 	GPRTOption.viewH = height;
-	GPRTOption.clearColor = glm::vec4(0, 0, 1, 0);
+	GPRTOption.clearColor = glm::vec4(0, 0, 0, 0);
 	GPRTOption.clearDepth = 1;
 	GPRTOption.hasDepth = true;
 	GPRTOption.depthOption.width = width;
@@ -75,27 +68,45 @@ void sunty::SimpleDeferredDrawer::init(const Config & config)
 	LPRTOption.viewY = 0;
 	LPRTOption.viewW = width;
 	LPRTOption.viewH = height;
-	LPRTOption.clearColor = glm::vec4(1, 0, 0, 1);
+	LPRTOption.clearColor = glm::vec4(0, 0, 0, 1);
 	LPRTOption.clearDepth = 1;
 	LPRTOption.hasDepth = false;
 
 	mLightingPassRT.reset(new RenderTarget);
 	mLightingPassRT->setup(LPRTOption);
 
+	Camera * geometryCamera = nullptr;
+	for (auto & c : mScene.cameras)
+	{
+		if (c.pass == PASS_GEOMETRY)
+		{
+			geometryCamera = &c;
+			break;
+		}
+	}
 
-	mLightingPassScene.renders.back().setParam("ViewerPosition", mGeometryPassScene.cameras.back().position);
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureWorldPosition", mGeometryPassRT->texture(0));
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureNormal", mGeometryPassRT->texture(1));
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureTangent", mGeometryPassRT->texture(2));
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureNormalMap", mGeometryPassRT->texture(3));
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureDiffuseMap", mGeometryPassRT->texture(4));
-	mLightingPassScene.renders.back().setParam("GBuffer.TextureSpecularMap", mGeometryPassRT->texture(5));
+	for (auto & render : mScene.renders)
+	{
+		if (render.pass != PASS_LIGHTING)
+		{
+			continue;
+		}
+		render.setParam("ViewerPosition", geometryCamera->position);
+		render.setParam("GBuffer.TextureWorldPosition", mGeometryPassRT->texture(0));
+		render.setParam("GBuffer.TextureNormal", mGeometryPassRT->texture(1));
+		render.setParam("GBuffer.TextureTangent", mGeometryPassRT->texture(2));
+		render.setParam("GBuffer.TextureNormalMap", mGeometryPassRT->texture(3));
+		render.setParam("GBuffer.TextureDiffuseMap", mGeometryPassRT->texture(4));
+		render.setParam("GBuffer.TextureSpecularMap", mGeometryPassRT->texture(5));
+	}
 }
 
 void SimpleDeferredDrawer::update(float delta)
 {
-	mGeometryPassScene.update(delta);
-	mLightingPassScene.update(delta);
+	mScene.pass = PASS_GEOMETRY;
+	mScene.update(delta);
+	mScene.pass = PASS_LIGHTING;
+	mScene.update(delta);
 }
 
 void sunty::SimpleDeferredDrawer::draw()
@@ -103,12 +114,14 @@ void sunty::SimpleDeferredDrawer::draw()
 	{
 		mGeometryPassRT->push();
 		mGeometryPassRT->clear();
-		mGeometryPassScene.draw();
+		mScene.pass = PASS_GEOMETRY;
+		mScene.draw();
 	}
 	{
 		mLightingPassRT->push();
 		mLightingPassRT->clear();
-		mLightingPassScene.draw();
+		mScene.pass = PASS_LIGHTING;
+		mScene.draw();
 	}
 }
 

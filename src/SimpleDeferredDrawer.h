@@ -19,8 +19,7 @@ namespace sunty
 		virtual void release() override;
 		virtual std::shared_ptr<RenderTarget> renderTarget() override;
 	private:
-		Scene mGeometryPassScene;
-		Scene mLightingPassScene;
+		Scene mScene;
 		std::shared_ptr<RenderTarget> mGeometryPassRT;
 		std::shared_ptr<RenderTarget> mLightingPassRT;
 	};

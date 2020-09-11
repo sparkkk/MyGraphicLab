@@ -16,12 +16,5 @@
     "type": "obj",
     "path": "resource/quad.obj"
   },
-  "material": {
-    "uniforms": [
-      {
-        "id": "Material.SpecularShiness",
-        "value": ["scalar", "128.0"]
-      }
-    ]
-  }
+  "material": {}
 }

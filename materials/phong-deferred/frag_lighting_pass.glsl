@@ -15,13 +15,6 @@ struct GBufferParam
 
 uniform GBufferParam GBuffer;
 
-struct MaterialParam
-{
-    float SpecularShiness;
-};
-
-uniform MaterialParam Material;
-
 struct PointLightParam
 {
     vec3 Position;
@@ -48,7 +41,9 @@ void main()
     vec3 tangentVec = texture(GBuffer.TextureTangent, vCoord).xyz;
     vec3 normalVal = normalize(texture(GBuffer.TextureNormalMap, vCoord).xyz * 2.0 - 1.0);
     vec3 diffuse = texture(GBuffer.TextureDiffuseMap, vCoord).rgb;
-    vec3 specular = texture(GBuffer.TextureSpecularMap, vCoord).rgb;
+    vec4 specularAndShiness = texture(GBuffer.TextureSpecularMap, vCoord);
+    vec3 specular = specularAndShiness.rgb;
+    float shiness = specularAndShiness.a;
 
     vec3 T = normalize(tangentVec);
     vec3 N = normalize(normalVec);
@@ -75,7 +70,7 @@ void main()
         vec3 reflectVec = reflect(-lightVec, normalVal);
         float cosLightNormal = max(dot(lightVec, normalVal), 0.0);
         float cosReflectView = max(dot(reflectVec, viewerVec), 0.0);
-        float spec = pow(cosReflectView, Material.SpecularShiness);
+        float spec = pow(cosReflectView, shiness);
         float dist = length(LightPosition - worldPosition);
         float attenuation = 1.0 / (LightAttenue.x + LightAttenue.y * dist + LightAttenue.z * dist * dist);
 

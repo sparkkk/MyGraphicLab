@@ -29,6 +29,10 @@
       {
         "id": "Material.TextureSpecular",
         "value": ["texture", "built-in", "white"]
+      },
+      {
+        "id": "Material.SpecularShiness",
+        "value": ["scalar", "128"]
       }
     ]
   }

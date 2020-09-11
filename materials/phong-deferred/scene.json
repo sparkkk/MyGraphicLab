@@ -3,6 +3,7 @@
   "cameras": [
     {
       "type": "perspect",
+      "pass": "geometry",
       "fan": 60,
       "aspect": [800, 600],
       "range": [1.0, 1000.0],
@@ -12,20 +13,14 @@
       "flipY": false
     },
     {
-      "type": "ortho",
-      "fan": 0,
-      "aspect": [40, 30],
-      "range": [10.0, 1000.0],
-      "at": [0, 0, 20],
-      "look": [0, 0, 0],
-      "up": [0, 1, 0],
-      "flipY": false
+      "type": "identity",
+      "pass": "lighting"
     }
   ],
   "renders": [
     {
-      "path": "render1.json",
-      "follow": false,
+      "path": "render.json",
+      "pass": "geometry",
       "transforms": [
         {
           "type": "scale",
@@ -52,8 +47,8 @@
       ]
     },
     {
-      "path": "render1.json",
-      "follow": false,
+      "path": "render.json",
+      "pass": "geometry",
       "transforms": [
         {
           "type": "scale",
@@ -82,12 +77,15 @@
           "value": ["texture", "built-in", "yellow"]
         }
       ]
+    },
+    {
+      "path": "render-lighting-pass.json",
+      "pass": "lighting"
     }
   ],
   "lights": [
     {
-      "path": "light1.json",
-      "uniforms": []
+      "path": "light1.json"
     }
   ]
 }

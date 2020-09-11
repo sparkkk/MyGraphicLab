@@ -14,13 +14,13 @@
   },
   "mesh": {
     "type": "obj",
-    "path": "../resource/toad.obj"
+    "path": "resource/toad.obj"
   },
   "material": {
     "uniforms": [
       {
         "id": "Material.TextureNormal",
-        "value": ["texture", "file", "../resource/Toad_Normal.png", "RGB"]
+        "value": ["texture", "file", "resource/Toad_Normal.png", "RGB"]
       },
       {
         "id": "Material.TextureDiffuse",
