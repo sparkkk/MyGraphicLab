@@ -13,21 +13,6 @@ namespace sunty
 			int width;
 			int height;
 		};
-		struct ObjectParam
-		{
-			glm::mat4 model;
-			float rotate;
-			glm::vec3 axis;
-		};
-		struct LightParam
-		{
-			glm::vec3 position;
-			glm::vec3 ambientColor;
-			glm::vec3 diffuseColor;
-			glm::vec3 specularColor;
-			glm::vec3 strengths;
-			glm::vec3 attenue;
-		};
 	public:
 		IDrawer();
 		virtual ~IDrawer();

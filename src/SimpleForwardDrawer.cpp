@@ -19,7 +19,6 @@ void sunty::SimpleForwardDrawer::init(const Config & config)
 {
 	int width = config.width;
 	int height = config.height;
-	float aspect = (float) config.width / (float) config.height;
 
 	DescLoader loader;
 	std::string scenePath;

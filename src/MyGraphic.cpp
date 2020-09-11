@@ -83,7 +83,7 @@ protected:
 		//loadPngTexture("../materials/resource/castle.png", "RGB", *ttt);
 		mCanvasScene.renders.back().setParam(
 			"Texture1",
-			mDrawer->renderTarget()->textures()[0]
+			mDrawer->renderTarget()->texture(0)
 			//ttt
 		);
 
