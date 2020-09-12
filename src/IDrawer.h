@@ -8,15 +8,9 @@ namespace sunty
 	class IDrawer
 	{
 	public:
-		struct Config
-		{
-			int width;
-			int height;
-		};
-	public:
 		IDrawer();
 		virtual ~IDrawer();
-		virtual void init(const Config & config) = 0;
+		virtual void init(const Starter & config) = 0;
 		virtual void update(float delta) = 0;
 		virtual void draw() = 0;
 		virtual void release() = 0;

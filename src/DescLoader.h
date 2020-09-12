@@ -21,14 +21,16 @@ namespace sunty
 		);
 		bool loadScene(
 			const std::filesystem::path & path,
+			const Starter & config,
 			Scene & scene
 		);
 		bool loadStarter(
 			const std::filesystem::path & path,
-			std::string & scenePath
+			Starter & starter
 		);
 		std::filesystem::path assembllyPath(const std::filesystem::path & path);
 		std::vector<std::filesystem::path> searchPaths;
+		Starter config;
 	};
 
 }

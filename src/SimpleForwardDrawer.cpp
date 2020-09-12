@@ -15,20 +15,14 @@ SimpleForwardDrawer::~SimpleForwardDrawer()
 	mCanvasRT.reset();
 }
 
-void sunty::SimpleForwardDrawer::init(const Config & config)
+void sunty::SimpleForwardDrawer::init(const Starter & config)
 {
 	int width = config.width;
 	int height = config.height;
 
 	DescLoader loader;
-	std::string scenePath;
-	if (!loader.loadStarter("../starter.json", scenePath))
-	{
-		printf("failed to load starter\n");
-		return;
-	}
 	loader.searchPaths.emplace_back("../materials");
-	if (!loader.loadScene(scenePath.c_str(), mScene))
+	if (!loader.loadScene(config.path, config, mScene))
 	{
 		printf("failed to load scene\n");
 		return;

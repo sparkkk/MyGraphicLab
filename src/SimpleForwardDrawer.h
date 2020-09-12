@@ -11,7 +11,7 @@ namespace sunty
 	public:
 		SimpleForwardDrawer();
 		virtual ~SimpleForwardDrawer();
-		virtual void init(const Config & config) override;
+		virtual void init(const Starter & config) override;
 		virtual void update(float delta) override;
 		virtual void draw() override;
 		virtual void release() override;

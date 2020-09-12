@@ -21,6 +21,12 @@ static std::map<std::string, Pass> sPassMap =
     { "lighting", PASS_LIGHTING },
 };
 
+static std::map<std::string, DrawerType> sDrawerTypeMap =
+{
+    { "forward", DRAWER_TYPE_FORWARD },
+    { "deferred", DRAWER_TYPE_DEFERRED },
+};
+
 #define JD_FROM_JSON(name) if (j.contains(#name)) { j.at(#name).get_to(jd.name); }
 
 struct JDRenderOptions
@@ -125,7 +131,7 @@ struct JDCameraItem
     std::string type;
     std::string pass = "default";
     float fan = 0;
-    std::vector<float> aspect;
+    float width = 0;
     std::vector<float> range;
     std::vector<float> at;
     std::vector<float> look;
@@ -138,7 +144,7 @@ void from_json(const json& j, JDCameraItem& jd)
     JD_FROM_JSON(type);
     JD_FROM_JSON(pass);
     JD_FROM_JSON(fan);
-    JD_FROM_JSON(aspect);
+    JD_FROM_JSON(width);
     JD_FROM_JSON(range);
     JD_FROM_JSON(at);
     JD_FROM_JSON(look);
@@ -539,12 +545,15 @@ static bool parseMaterial(ParseContext & context, const JDMaterial & jd)
 
 static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
 {
+    auto & config = context.loader->config;
+    float aspect = (float) config.width / (float) config.height;
+
     if (jd.type == "perspect")
     {
         context.cameras.emplace_back();
         context.cameras.back().makePerspectProj(
             glm::pi<float>() * jd.fan / 180.0f,
-            jd.aspect[0] / jd.aspect[1],
+            aspect,
             jd.range[0],
             jd.range[1]
         );
@@ -561,8 +570,8 @@ static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
     {
         context.cameras.emplace_back();
         context.cameras.back().makeOrthoProj(
-            jd.aspect[0],
-            jd.aspect[1],
+            jd.width,
+            jd.width / aspect,
             jd.range[0],
             jd.range[1]
         );
@@ -789,6 +798,7 @@ bool sunty::DescLoader::loadLight(
 
 bool sunty::DescLoader::loadScene(
 	const std::filesystem::path & path,
+    const Starter & config,
     Scene & scene)
 {
     auto asbPath = assembllyPath(path);
@@ -797,6 +807,8 @@ bool sunty::DescLoader::loadScene(
     {
         return false;
     }
+
+    this->config = config;
 
     searchPaths.emplace_back(asbPath.parent_path());
 
@@ -862,12 +874,16 @@ bool sunty::DescLoader::loadScene(
 struct JDStarter
 {
     std::string version;
+    int width = 800;
+    int height = 600;
+    int fps = 40;
+    std::string drawerType = "forward";
     std::string path;
 };
 
 bool DescLoader::loadStarter(
 	const std::filesystem::path & path,
-    std::string & scenePath)
+    Starter & starter)
 {
     std::ifstream streamIn(path);
     if (!streamIn.is_open())
@@ -878,9 +894,17 @@ bool DescLoader::loadStarter(
     JDStarter jd;
     streamIn >> j;
     JD_FROM_JSON(version);
+    JD_FROM_JSON(width);
+    JD_FROM_JSON(height);
+    JD_FROM_JSON(fps);
+    JD_FROM_JSON(drawerType);
     JD_FROM_JSON(path);
 
-    scenePath = jd.path;
+    starter.width = jd.width;
+    starter.height = jd.height;
+    starter.fps = jd.fps;
+    starter.drawerType = sDrawerTypeMap[jd.drawerType];
+    starter.path = jd.path;
     return true;
 }
 

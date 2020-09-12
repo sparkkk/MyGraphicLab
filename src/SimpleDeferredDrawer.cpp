@@ -13,14 +13,14 @@ SimpleDeferredDrawer::~SimpleDeferredDrawer()
 	release();
 }
 
-void sunty::SimpleDeferredDrawer::init(const Config & config)
+void sunty::SimpleDeferredDrawer::init(const Starter & config)
 {
 	int width = config.width;
 	int height = config.height;
 
 	DescLoader loader;
 	loader.searchPaths.emplace_back("../materials");
-	if (!loader.loadScene("phong-deferred/scene.json", mScene))
+	if (!loader.loadScene(config.path, config, mScene))
 	{
 		printf("failed to load scene\n");
 	}

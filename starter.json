@@ -1,4 +1,8 @@
 {
     "version": "0.1",
-    "path": "blinn-phong/scene.json"
+    "width": 800,
+    "height": 600,
+    "fps": 40,
+    "drawerType": "forward",
+    "path": "phong/scene.json"
 }
