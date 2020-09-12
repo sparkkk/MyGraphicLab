@@ -24,9 +24,12 @@ void sunty::SimpleForwardDrawer::init(const Starter & config)
 	loader.searchPaths.emplace_back("../materials");
 	if (!loader.loadScene(config.path, config, mScene))
 	{
-		printf("failed to load scene\n");
+		printf("failed to load scene: %s\n", config.path.c_str());
 		return;
 	}
+
+	mScene.setCurrentPass(PASS_DEFAULT);
+	mScene.setup();
 
 	RenderTarget::Options canvasOptions;
 	canvasOptions.externalFBO = false;

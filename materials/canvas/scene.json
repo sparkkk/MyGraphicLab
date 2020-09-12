@@ -3,18 +3,14 @@
   "cameras": [
     {
       "type": "identity",
-      "fan": 0,
-      "aspect": [],
-      "range": [],
-      "at": [],
-      "look": [],
-      "up": [],
+      "pass": [ "default" ],
       "flipY": false
     }
   ],
   "renders": [
     {
       "path": "render.json",
+      "pass": [ "default" ],
       "transforms": [],
       "uniforms": []
     }

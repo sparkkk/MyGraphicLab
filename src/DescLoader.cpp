@@ -2,6 +2,7 @@
 #include "nlohmann/json.hpp"
 #include "SimpleObjLoader.h"
 #include "ImageUtils.h"
+#include "RenderGroup.h"
 
 using namespace sunty;
 using namespace nlohmann;
@@ -26,6 +27,33 @@ static std::map<std::string, DrawerType> sDrawerTypeMap =
     { "forward", DRAWER_TYPE_FORWARD },
     { "deferred", DRAWER_TYPE_DEFERRED },
 };
+
+static Pass parsePass(const std::vector<std::string> & pass)
+{
+    Pass res = PASS_NONE;
+    for (auto & p : pass)
+    {
+        res = (Pass) (res | sPassMap[p]);
+    }
+    return res;
+}
+
+static std::vector<std::string> split(const std::string & text, const std::string & sep)
+{
+    std::vector<std::string> res;
+    size_t p = 0;
+    size_t q = 0;
+    q = text.find(sep, p);
+    while (q != std::string::npos)
+    {
+        res.emplace_back(text.substr(p, q - p));
+        p = q + sep.size();
+        q = text.find(sep, p);
+    }
+    res.emplace_back(text.substr(p));
+    return res;
+}
+
 
 #define JD_FROM_JSON(name) if (j.contains(#name)) { j.at(#name).get_to(jd.name); }
 
@@ -129,7 +157,7 @@ void from_json(const json& j, JDLight& jd)
 struct JDCameraItem
 {
     std::string type;
-    std::string pass = "default";
+    std::vector<std::string> pass;
     float fan = 0;
     float width = 0;
     std::vector<float> range;
@@ -152,6 +180,30 @@ void from_json(const json& j, JDCameraItem& jd)
     JD_FROM_JSON(flipY);
 }
 
+struct JDRenderGroupRenderItem
+{
+    std::string path;
+    std::vector<std::string> pass;
+};
+
+void from_json(const json& j, JDRenderGroupRenderItem& jd)
+{
+    JD_FROM_JSON(path);
+    JD_FROM_JSON(pass);
+}
+
+struct JDRenderGroupItem
+{
+    std::string name;
+    std::vector<JDRenderGroupRenderItem> renders;
+};
+
+void from_json(const json& j, JDRenderGroupItem& jd)
+{
+    JD_FROM_JSON(name);
+    JD_FROM_JSON(renders);
+}
+
 struct JDTransformItem
 {
     std::string type;
@@ -167,7 +219,8 @@ void from_json(const json& j, JDTransformItem& jd)
 struct JDRenderItem
 {
     std::string path;
-    std::string pass = "default";
+    std::string group;
+    std::vector<std::string> pass;
     bool follow = false;
     std::vector<JDTransformItem> transforms;
     std::vector<JDUniformItem> uniforms;
@@ -176,6 +229,7 @@ struct JDRenderItem
 void from_json(const json& j, JDRenderItem& jd)
 {
     JD_FROM_JSON(path);
+    JD_FROM_JSON(group);
     JD_FROM_JSON(pass);
     JD_FROM_JSON(follow);
     JD_FROM_JSON(transforms);
@@ -198,6 +252,7 @@ struct JDScene
 {
     std::string version;
     std::vector<JDCameraItem> cameras;
+    std::vector<JDRenderGroupItem> renderGroups;
     std::vector<JDRenderItem> renders;
     std::vector<JDLightItem> lights;
 };
@@ -206,6 +261,7 @@ void from_json(const json& j, JDScene& jd)
 {
     JD_FROM_JSON(version);
     JD_FROM_JSON(cameras);
+    JD_FROM_JSON(renderGroups);
     JD_FROM_JSON(renders);
     JD_FROM_JSON(lights);
 }
@@ -236,7 +292,8 @@ struct ParseContext
     std::shared_ptr<VertexArrayObject> vao;
     std::unordered_map<std::string, UniformValue> uniforms;
     std::vector<Camera> cameras;
-    std::vector<RenderObject> renders;
+    std::unordered_map<std::string, JDRenderGroupItem> renderGroupMap;
+    std::vector<std::shared_ptr<IRenderObject>> renders;
     std::vector<std::vector<Scene::Transform>> transforms;
     std::vector<Scene::Light> lights;
     std::vector<bool> follows;
@@ -563,7 +620,7 @@ static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
             glm::vec3(jd.up[0], jd.up[1], jd.up[2])
         );
         context.cameras.back().flipY = jd.flipY;
-        context.cameras.back().pass = sPassMap[jd.pass];
+        context.cameras.back().pass = parsePass(jd.pass);
         return true;
     }
     else if (jd.type == "ortho")
@@ -581,36 +638,20 @@ static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
             glm::vec3(jd.up[0], jd.up[1], jd.up[2])
         );
         context.cameras.back().flipY = jd.flipY;
-        context.cameras.back().pass = sPassMap[jd.pass];
+        context.cameras.back().pass = parsePass(jd.pass);
         return true;
     }
     else if (jd.type == "identity")
     {
         context.cameras.emplace_back();
         context.cameras.back().flipY = jd.flipY;
-        context.cameras.back().pass = sPassMap[jd.pass];
+        context.cameras.back().pass = parsePass(jd.pass);
         return true;
     }
     else
     {
         return false;
     }
-}
-
-static std::vector<std::string> split(const std::string & text, const std::string & sep)
-{
-    std::vector<std::string> res;
-    size_t p = 0;
-    size_t q = 0;
-    q = text.find(sep, p);
-    while (q != std::string::npos)
-    {
-        res.emplace_back(text.substr(p, q - p));
-        p = q + sep.size();
-        q = text.find(sep, p);
-    }
-    res.emplace_back(text.substr(p));
-    return res;
 }
 
 static bool parseTransformItem(ParseContext & context, const JDTransformItem & jd)
@@ -646,11 +687,38 @@ static bool parseRenderItem(ParseContext & context, const JDRenderItem & jd)
     context.transforms.emplace_back();
     context.follows.emplace_back(jd.follow);
     DescLoader& loader = *context.loader;
-    if (!loader.loadRenderObject(jd.path, context.renders.back()))
+    if (jd.path != "")
+    {
+        context.renders.back().reset(new RenderObject);
+        auto ptr = std::static_pointer_cast<RenderObject>(context.renders.back());
+        if (!loader.loadRenderObject(jd.path, *ptr))
+        {
+            return false;
+        }
+    }
+    else if (jd.group != "")
+    {
+        context.renders.back().reset(new RenderGroup);
+        auto & jdGroup = context.renderGroupMap[jd.group];
+        std::vector<std::shared_ptr<IRenderObject>> subRenders;
+        for (auto & item : jdGroup.renders)
+        {
+            subRenders.emplace_back(new RenderObject);
+            auto subPtr = std::static_pointer_cast<RenderObject>(subRenders.back());
+            if (!loader.loadRenderObject(item.path, *subPtr))
+            {
+                return false;
+            }
+            subPtr->setPassMask(parsePass(item.pass));
+        }
+        auto ptr = std::static_pointer_cast<RenderGroup>(context.renders.back());
+        ptr->setup(subRenders);
+    }
+    else
     {
         return false;
     }
-    context.renders.back().pass = sPassMap[jd.pass];
+    context.renders.back()->setPassMask(parsePass(jd.pass));
     for (auto & item : jd.transforms)
     {
         if (!parseTransformItem(context, item))
@@ -829,6 +897,10 @@ bool sunty::DescLoader::loadScene(
             return false;
         }
     }
+    for (auto & item : jdScene.renderGroups)
+    {
+        context.renderGroupMap[item.name] = item;
+    }
     for (auto & item : jdScene.renders)
     {
         if (!parseRenderItem(context, item))
@@ -840,7 +912,7 @@ bool sunty::DescLoader::loadScene(
         {
             auto & id = entry.first;
             auto & value = entry.second;
-            context.renders.back().setParam(id.c_str(), value);
+            context.renders.back()->setParam(id.c_str(), value);
         }
     }
     for (auto & item : jdScene.lights)
@@ -863,8 +935,6 @@ bool sunty::DescLoader::loadScene(
     scene.transforms = std::move(context.transforms);
     scene.lights = std::move(context.lights);
     scene.follows = std::move(context.follows);
-
-    scene.setup();
 
     searchPaths.pop_back();
 

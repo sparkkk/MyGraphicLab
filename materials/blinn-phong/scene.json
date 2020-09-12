@@ -3,8 +3,8 @@
   "cameras": [
     {
       "type": "perspect",
+      "pass": [ "default" ],
       "fan": 60,
-      "aspect": [800, 600],
       "range": [10.0, 100.0],
       "at": [0, 0, 20],
       "look": [0, 0, 0],
@@ -15,6 +15,7 @@
   "renders": [
     {
       "path": "render1.json",
+      "pass": [ "default" ],
       "follow": false,
       "transforms": [
         {
@@ -43,6 +44,7 @@
     },
     {
       "path": "render1.json",
+      "pass": [ "default" ],
       "follow": false,
       "transforms": [
         {

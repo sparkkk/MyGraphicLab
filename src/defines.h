@@ -4,9 +4,10 @@ namespace sunty
 {
     enum Pass
     {
-        PASS_DEFAULT = 0,
-        PASS_GEOMETRY,
-        PASS_LIGHTING,
+        PASS_NONE        = 0x00,
+        PASS_DEFAULT     = 0x01,
+        PASS_GEOMETRY    = 0x02,
+        PASS_LIGHTING    = 0x04,
     };
 
     enum DrawerType

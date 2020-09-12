@@ -19,7 +19,7 @@ void Scene::setup()
 
 	for (auto & c : cameras)
 	{
-		if (c.pass == pass)
+		if (c.pass & pass)
 		{
 			pCamera = &c;
 			break;
@@ -40,7 +40,7 @@ void Scene::setup()
 	for (int k = 0; k < renders.size(); ++k)
 	{
 		auto & render = renders[k];
-		if (render.pass != pass)
+		if ((render->getPassMask() & pass) == 0)
 		{
 			continue;
 		}
@@ -54,10 +54,10 @@ void Scene::setup()
 			mvp = flipper * camera.getP() * mv;
 		}
 
-		render.setParam("PositionTransform", mvp);
-		render.setParam("WorldTransform", transform);
-		render.setParam("ViewerPosition", camera.position);
-		render.setParam("Light.LightCount", (int) lights.size());
+		render->setParam("PositionTransform", mvp);
+		render->setParam("WorldTransform", transform);
+		render->setParam("ViewerPosition", camera.position);
+		render->setParam("Light.LightCount", (int) lights.size());
 
 		for (int i = 0; i < lights.size(); ++i)
 		{
@@ -75,7 +75,7 @@ void Scene::setup()
 				{
 					id = id.replace(p, 3, indexNote);
 				}
-				render.setParam(id.c_str(), value);
+				render->setParam(id.c_str(), value);
 			}
 		}
 	}
@@ -162,7 +162,7 @@ void Scene::update(float delta)
 
 	for (auto & c : cameras)
 	{
-		if (c.pass == pass)
+		if (c.pass & pass)
 		{
 			pCamera = &c;
 			break;
@@ -183,7 +183,7 @@ void Scene::update(float delta)
 	for (int k = 0; k < renders.size(); ++k)
 	{
 		auto & render = renders[k];
-		if (render.pass != pass)
+		if ((render->getPassMask() & pass) == 0)
 		{
 			continue;
 		}
@@ -196,8 +196,8 @@ void Scene::update(float delta)
 			auto mv = glm::mat4(glm::mat3(camera.getV() * transform));
 			mvp = flipper * camera.getP() * mv;
 		}
-		render.setParam("PositionTransform", mvp);
-		render.setParam("WorldTransform", transform);
+		render->setParam("PositionTransform", mvp);
+		render->setParam("WorldTransform", transform);
 	}
 }
 
@@ -205,10 +205,19 @@ void Scene::draw()
 {
 	for (auto & render : renders)
 	{
-		if (render.pass != pass)
+		if ((render->getPassMask() & pass) == 0)
 		{
 			continue;
 		}
-		render.draw();
+		render->draw();
 	}
+}
+
+void Scene::setCurrentPass(Pass pass)
+{
+	for (auto r : renders)
+	{
+		r->setCurrentPass(pass);
+	}
+	this->pass = pass;
 }

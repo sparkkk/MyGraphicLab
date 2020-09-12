@@ -104,9 +104,11 @@ protected:
 			mStarter,
 			mCanvasScene
 		);
+		mCanvasScene.setCurrentPass(PASS_DEFAULT);
+		mCanvasScene.setup();
 		//auto ttt = std::make_shared<Texture>();
 		//loadPngTexture("../materials/resource/castle.png", "RGB", *ttt);
-		mCanvasScene.renders.back().setParam(
+		mCanvasScene.renders.back()->setParam(
 			"Texture1",
 			mDrawer->renderTarget()->texture(0)
 			//ttt

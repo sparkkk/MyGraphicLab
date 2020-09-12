@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "Scene.h"
+#include "RenderObject.h"
 
 namespace sunty
 {

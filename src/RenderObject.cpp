@@ -2,16 +2,6 @@
 
 using namespace sunty;
 
-RenderObject::RenderObject()
-{
-}
-
-
-RenderObject::~RenderObject()
-{
-	release();
-}
-
 void RenderObject::setup(
 	std::shared_ptr<VertexBufferObject> vbo, 
 	std::shared_ptr<VertexArrayObject> vao, 
@@ -26,128 +16,22 @@ void RenderObject::setup(
 	mShader->use(true);
 	mVAO->use(true);
 	mVBO->use(true);
-	mShader->setAttribute("Position", VertexBufferObject::AttrType::ATTR_POSITION, *mVBO);
-	mShader->setAttribute("Color", VertexBufferObject::AttrType::ATTR_COLOR, *mVBO);
-	mShader->setAttribute("Coord", VertexBufferObject::AttrType::ATTR_TEXTURE_COORD, *mVBO);
-	mShader->setAttribute("Normal", VertexBufferObject::AttrType::ATTR_NORMAL, *mVBO);
-	mShader->setAttribute("Tangent", VertexBufferObject::AttrType::ATTR_TANGENT, *mVBO);
+	mShader->setAttribute("Position", VertexBufferObject::AttrType::ATTR_POSITION, *vbo);
+	mShader->setAttribute("Color", VertexBufferObject::AttrType::ATTR_COLOR, *vbo);
+	mShader->setAttribute("Coord", VertexBufferObject::AttrType::ATTR_TEXTURE_COORD, *vbo);
+	mShader->setAttribute("Normal", VertexBufferObject::AttrType::ATTR_NORMAL, *vbo);
+	mShader->setAttribute("Tangent", VertexBufferObject::AttrType::ATTR_TANGENT, *vbo);
 	mVBO->use(false);
 	mVAO->use(false);
 	mShader->use(false);
 }
 
-bool sunty::RenderObject::setParam(const char * name, float value)
+void sunty::RenderObject::setParam(const char * name, const UniformValue & value)
 {
-	if (!mShader->hasUniform(name))
+	if (mShader->hasUniform(name))
 	{
-		return false;
+		mParams[name] = value;
 	}
-	UniformValue param;
-	param.type = UniformValue::TYPE_SCALAR;
-	param.scalar = value;
-	mParams[name] = param;
-	return true;
-}
-
-bool sunty::RenderObject::setParam(const char * name, int value)
-{
-	if (!mShader->hasUniform(name))
-	{
-		return false;
-	}
-	UniformValue param;
-	param.type = UniformValue::TYPE_INTEGER;
-	param.integer = value;
-	mParams[name] = param;
-	return true;
-}
-
-bool sunty::RenderObject::setParam(const char * name, const glm::vec2 & value)
-{
-	if (!mShader->hasUniform(name))
-	{
-		return false;
-	}
-	UniformValue param;
-	param.type = UniformValue::TYPE_VECTOR2;
-	memcpy(param.vector2, glm::value_ptr(value), sizeof(param.vector2));
-	mParams[name] = param;
-	return true;
-}
-
-bool sunty::RenderObject::setParam(const char * name, const glm::vec3 & value)
-{
-	if (!mShader->hasUniform(name))
-	{
-		return false;
-	}
-	UniformValue param;
-	param.type = UniformValue::TYPE_VECTOR3;
-	memcpy(param.vector3, glm::value_ptr(value), sizeof(param.vector3));
-	mParams[name] = param;
-	return true;
-}
-
-bool sunty::RenderObject::setParam(const char * name, const glm::vec4 & value)
-{
-	if (!mShader->hasUniform(name))
-	{
-		return false;
-	}
-	UniformValue param;
-	param.type = UniformValue::TYPE_VECTOR4;
-	memcpy(param.vector4, glm::value_ptr(value), sizeof(param.vector4));
-	mParams[name] = param;
-	return true;
-}
-
-bool sunty::RenderObject::setParam(const char * name, const glm::mat3 & value)
-{
-	if (!mShader->hasUniform(name))
-	{
-		return false;
-	}
-	UniformValue param;
-	param.type = UniformValue::TYPE_MATRIX3;
-	memcpy(param.matrix3, glm::value_ptr(value), sizeof(param.matrix3));
-	mParams[name] = param;
-	return true;
-}
-
-bool sunty::RenderObject::setParam(const char * name, const glm::mat4 & value)
-{
-	if (!mShader->hasUniform(name))
-	{
-		return false;
-	}
-	UniformValue param;
-	param.type = UniformValue::TYPE_MATRIX4;
-	memcpy(param.matrix4, glm::value_ptr(value), sizeof(param.matrix4));
-	mParams[name] = param;
-	return true;
-}
-
-bool sunty::RenderObject::setParam(const char * name, std::shared_ptr<Texture> value)
-{
-	if (!mShader->hasUniform(name))
-	{
-		return false;
-	}
-	UniformValue param;
-	param.type = UniformValue::TYPE_TEXTURE;
-	param.texture = value;
-	mParams[name] = param;
-	return true;
-}
-
-bool sunty::RenderObject::setParam(const char * name, const UniformValue & value)
-{
-	if (!mShader->hasUniform(name))
-	{
-		return false;
-	}
-	mParams[name] = value;
-	return true;
 }
 
 void sunty::RenderObject::draw()
@@ -246,8 +130,4 @@ void sunty::RenderObject::draw()
 	}
 	mVAO->use(false);
 	mShader->use(false);
-}
-
-void sunty::RenderObject::release()
-{
 }

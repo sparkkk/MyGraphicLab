@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include "RenderObject.h"
+#include "IRenderObject.h"
 #include "Camera.h"
 
 namespace sunty
@@ -33,13 +33,15 @@ namespace sunty
 		void setup();
 		void update(float delta);
 		void draw();
+		void setCurrentPass(Pass pass);
 		std::vector<Camera> cameras;
-		std::vector<RenderObject> renders;
+		std::vector<std::shared_ptr<IRenderObject>> renders;
 		std::vector<std::vector<Transform>> transforms;
 		std::unordered_map<std::string, float> valueMap;
 		std::vector<glm::mat4> matrices;
 		std::vector<Light> lights;
 		std::vector<bool> follows;
+	private:
 		Pass pass = PASS_DEFAULT;
 	};
 }

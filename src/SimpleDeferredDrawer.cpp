@@ -24,9 +24,9 @@ void sunty::SimpleDeferredDrawer::init(const Starter & config)
 	{
 		printf("failed to load scene\n");
 	}
-	mScene.pass = PASS_GEOMETRY;
+	mScene.setCurrentPass(PASS_GEOMETRY);
 	mScene.setup();
-	mScene.pass = PASS_LIGHTING;
+	mScene.setCurrentPass(PASS_LIGHTING);
 	mScene.setup();
 
 	RenderTarget::Options GPRTOption;
@@ -78,34 +78,34 @@ void sunty::SimpleDeferredDrawer::init(const Starter & config)
 	Camera * geometryCamera = nullptr;
 	for (auto & c : mScene.cameras)
 	{
-		if (c.pass == PASS_GEOMETRY)
+		if (c.pass & PASS_GEOMETRY)
 		{
 			geometryCamera = &c;
 			break;
 		}
 	}
 
-	for (auto & render : mScene.renders)
+	for (auto render : mScene.renders)
 	{
-		if (render.pass != PASS_LIGHTING)
+		if ((render->getPassMask() & PASS_LIGHTING) == 0)
 		{
 			continue;
 		}
-		render.setParam("ViewerPosition", geometryCamera->position);
-		render.setParam("GBuffer.TextureWorldPosition", mGeometryPassRT->texture(0));
-		render.setParam("GBuffer.TextureNormal", mGeometryPassRT->texture(1));
-		render.setParam("GBuffer.TextureTangent", mGeometryPassRT->texture(2));
-		render.setParam("GBuffer.TextureNormalMap", mGeometryPassRT->texture(3));
-		render.setParam("GBuffer.TextureDiffuseMap", mGeometryPassRT->texture(4));
-		render.setParam("GBuffer.TextureSpecularMap", mGeometryPassRT->texture(5));
+		render->setParam("ViewerPosition", geometryCamera->position);
+		render->setParam("GBuffer.TextureWorldPosition", mGeometryPassRT->texture(0));
+		render->setParam("GBuffer.TextureNormal", mGeometryPassRT->texture(1));
+		render->setParam("GBuffer.TextureTangent", mGeometryPassRT->texture(2));
+		render->setParam("GBuffer.TextureNormalMap", mGeometryPassRT->texture(3));
+		render->setParam("GBuffer.TextureDiffuseMap", mGeometryPassRT->texture(4));
+		render->setParam("GBuffer.TextureSpecularMap", mGeometryPassRT->texture(5));
 	}
 }
 
 void SimpleDeferredDrawer::update(float delta)
 {
-	mScene.pass = PASS_GEOMETRY;
+	mScene.setCurrentPass(PASS_GEOMETRY);
 	mScene.update(delta);
-	mScene.pass = PASS_LIGHTING;
+	mScene.setCurrentPass(PASS_LIGHTING);
 	mScene.update(delta);
 }
 
@@ -114,13 +114,13 @@ void sunty::SimpleDeferredDrawer::draw()
 	{
 		mGeometryPassRT->push();
 		mGeometryPassRT->clear();
-		mScene.pass = PASS_GEOMETRY;
+		mScene.setCurrentPass(PASS_GEOMETRY);
 		mScene.draw();
 	}
 	{
 		mLightingPassRT->push();
 		mLightingPassRT->clear();
-		mScene.pass = PASS_LIGHTING;
+		mScene.setCurrentPass(PASS_LIGHTING);
 		mScene.draw();
 	}
 }

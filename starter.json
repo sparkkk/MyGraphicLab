@@ -3,6 +3,6 @@
     "width": 800,
     "height": 600,
     "fps": 40,
-    "drawerType": "forward",
-    "path": "phong/scene.json"
+    "drawerType": "deferred",
+    "path": "phong-deferred/scene.json"
 }
