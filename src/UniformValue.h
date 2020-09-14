@@ -32,7 +32,13 @@ namespace sunty
 			int integer;
 		};
 		std::shared_ptr<Texture> texture;
+
 		UniformValue() = default;
+
+		UniformValue(const UniformValue & other) = default;
+
+		UniformValue(UniformValue && other) = default;
+
 		UniformValue(float value)
 		{
 			type = TYPE_SCALAR;
@@ -73,5 +79,7 @@ namespace sunty
 			type = TYPE_TEXTURE;
 			texture = value;
 		}
+
+		UniformValue & operator = (const UniformValue & other) = default;
 	};
 }

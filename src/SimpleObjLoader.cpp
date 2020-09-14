@@ -255,6 +255,5 @@ bool sunty::SimpleObjLoader::load(
 		faces.size() * (sizeof(faces[0]) / sizeof(uint32_t))
 	);
 
-	printf("obj model %s loaded successfully\n", path.string().c_str());
 	return true;
 }

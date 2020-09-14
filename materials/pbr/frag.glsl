@@ -1,143 +1,62 @@
 #version 330
+#extension GL_ARB_shading_language_include : require
+
+#include "pbr-common.glsl"
 
 in vec2 vCoord;
 in vec3 vWorldPosition;
 in vec3 vViewerPosition;
 in mat3 vTBN;
 
-struct MaterialParam
-{
-    sampler2D TextureAlbedo;
-    sampler2D TextureNormal;
-    sampler2D TextureMetallic;
-    sampler2D TextureRoughness;
-    sampler2D TextureAmbientOcclusion;
-};
 
-struct PointLightParam
-{
-    vec3 Position;
-    vec3 Color;
-};
+uniform MaterialUniform Material;
 
-struct LightParam
-{
-    int LightCount;
-    PointLightParam Lights[4];
-    vec3 Attenue;
-};
-
-uniform MaterialParam Material;
-
-
-uniform LightParam Light;
+uniform LightUniform Light;
 
 uniform float Exposure;
 
 layout (location = 0) out vec4 gColor;
 
-const float PI = 3.14159265359;
-  
-float DistributionGGX(vec3 N, vec3 H, float roughness);
-float GeometrySchlickGGX(float NdotV, float roughness);
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
-vec3 fresnelSchlick(float cosTheta, vec3 F0);
-vec3 toneMapping(vec3 color);
-
 void main()
 {
-    vec3 albedo = texture(Material.TextureAlbedo, vCoord).rgb;
-    albedo = pow(albedo, vec3(2.2));
-    float metallic = texture(Material.TextureMetallic, vCoord).x;
-    float roughness = texture(Material.TextureRoughness, vCoord).x;
-    float ambientOcclusion = texture(Material.TextureAmbientOcclusion, vCoord).x;
+    GeomParam geomParam;
+    MaterialParam matParam;
 
-    vec3 LightAttenue = Light.Attenue;
+    matParam.albedo = pow(texture(Material.TextureAlbedo, vCoord).rgb, vec3(2.2));
+    matParam.metallic = texture(Material.TextureMetallic, vCoord).x;
+    matParam.roughness = texture(Material.TextureRoughness, vCoord).x;
+    matParam.ao = texture(Material.TextureAmbientOcclusion, vCoord).x;
+    matParam.f0 = mix(vec3(0.04), matParam.albedo, matParam.metallic);
 
-    vec3 N = normalize(texture(Material.TextureNormal, vCoord).xyz * 2.0 - 1.0);
-    vec3 V = normalize(vViewerPosition - vWorldPosition);
-    
-    vec3 F0 = vec3(0.04); 
-    F0 = mix(F0, albedo, metallic);
+    geomParam.position = vWorldPosition;
+    geomParam.normal = normalize(texture(Material.TextureNormal, vCoord).xyz * 2.0 - 1.0);
+    geomParam.viewer = normalize(vViewerPosition - vWorldPosition);
 
     vec3 Lo = vec3(0.0);
+
     for (int i = 0; i < Light.LightCount; ++i)
     {
-        vec3 LightPosition = vTBN * Light.Lights[i].Position;
-        vec3 LightColor = Light.Lights[i].Color;
+        LightParam lightParam;
+        lightParam.position = vTBN * Light.Lights[i].Position;
+        lightParam.direction = vTBN * Light.Lights[i].Direction;
+        lightParam.color = Light.Lights[i].Color;
+        lightParam.attenue = Light.Attenue;
 
-        vec3 L = normalize(LightPosition - vWorldPosition);
-        vec3 H = normalize(V + L);
-
-        float NLdot = max(dot(L, N), 0.0);
-
-        float dist = length(LightPosition - vWorldPosition);
-        float attenuation = 1.0 / (LightAttenue.x + LightAttenue.y * dist + LightAttenue.z * dist * dist);
-        vec3 radiance = LightColor * attenuation;
-        
-        float NDF = DistributionGGX(N, H, roughness);
-        float G   = GeometrySmith(N, V, L, roughness);
-        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
-        vec3 kD = vec3(1.0) - F;
-        kD *= 1.0 - metallic;
-        vec3 diffuse = kD * albedo / PI;
-        
-        vec3 numerator    = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
-        vec3 specular     = numerator / max(denominator, 0.001);
-
-        Lo += (diffuse + specular) * NLdot * radiance;
+        switch(Light.Lights[i].Type)
+        {
+        case LIGHT_TYPE_D:
+            Lo += calcPbrLightD(lightParam, geomParam, matParam);
+            break;
+        case LIGHT_TYPE_P:
+            Lo += calcPbrLightP(lightParam, geomParam, matParam);
+            break;
+        }
     }
 
-    vec3 ambient = vec3(0.03) * albedo * ambientOcclusion;
+    vec3 ambient = vec3(0.03) * matParam.albedo * matParam.ao;
     vec3 color = ambient + Lo;
 	
-    color = toneMapping(color);
+    color = ToneMapping(color, Exposure);
    
     gColor = vec4(color, 1.0);
-}
-
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
-    float a = roughness * roughness;
-    float a2     = a * a;
-    float NdotH  = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH*NdotH;
-	
-    float num   = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
-	
-    return num / denom;
-}
-
-float GeometrySchlickGGX(float NdotV, float roughness)
-{
-    float r = (roughness + 1.0);
-    float k = (r*r) / 8.0;
-
-    float num   = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-	
-    return num / denom;
-}
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-{
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotL = max(dot(N, L), 0.0);
-    float ggx2  = GeometrySchlickGGX(NdotV, roughness);
-    float ggx1  = GeometrySchlickGGX(NdotL, roughness);
-	
-    return ggx1 * ggx2;
-}
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-}
-vec3 toneMapping(vec3 color)
-{
-    color = vec3(1.0) - exp(-color * Exposure);
-    color = pow(color, vec3(1.0 / 2.2));
-    return color;
 }

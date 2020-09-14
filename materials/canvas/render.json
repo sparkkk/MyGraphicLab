@@ -20,7 +20,7 @@
     "uniforms": [
       {
         "id": "Texture1",
-        "value": ["texture", "file", "resource/castle.png", "RGB"]
+        "value": ["texture", "built-in", "white"]
       }
     ]
   }

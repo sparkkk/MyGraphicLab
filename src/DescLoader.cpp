@@ -357,8 +357,7 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
                     {
                         return false;
                     }
-                    value.type = UniformValue::TYPE_TEXTURE;
-                    value.texture = std::static_pointer_cast<Texture>(texture);
+                    value = std::static_pointer_cast<Texture>(texture);
                     return true;
                 }
                 else if (type == "built-in")
@@ -428,8 +427,7 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
                     option.inputDataType = Texture::DT_BYTE;
                     option.data = buf;
                     texture->setup(option);
-                    value.type = UniformValue::TYPE_TEXTURE;
-                    value.texture = texture;
+                    value = texture;
                     return true;
                 }
                 else if (type == "rgb")
@@ -456,8 +454,7 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
                     option.inputDataType = Texture::DT_F32;
                     option.data = buf;
                     texture->setup(option);
-                    value.type = UniformValue::TYPE_TEXTURE;
-                    value.texture = texture;
+                    value = texture;
                     return true;
                 }
                 else
@@ -480,8 +477,7 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
                     {
                         return false;
                     }
-                    value.type = UniformValue::TYPE_TEXTURE;
-                    value.texture = std::static_pointer_cast<Cubemap>(cubemap);
+                    value = std::static_pointer_cast<Texture>(cubemap);
                     return true;
                 }
                 else
@@ -493,55 +489,61 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
         {
             "scalar",
             [&]() -> bool {
-                value.type = UniformValue::TYPE_SCALAR;
-                value.scalar = (float) std::atof(list[1].c_str());
+                value = (float) std::atof(list[1].c_str());
                 return true;
             }
         },
         {
             "vec2",
             [&]() -> bool {
-                value.type = UniformValue::TYPE_VECTOR2;
-                value.vector2[0] = (float)std::atof(list[1].c_str());
-                value.vector2[1] = (float)std::atof(list[2].c_str());
+                value = glm::vec2(
+                    (float) std::atof(list[1].c_str()),
+                    (float) std::atof(list[2].c_str())
+                );
                 return true;
             }
         },
         {
             "vec3",
             [&]() -> bool {
-                value.type = UniformValue::TYPE_VECTOR3;
-                value.vector3[0] = (float)std::atof(list[1].c_str());
-                value.vector3[1] = (float)std::atof(list[2].c_str());
-                value.vector3[2] = (float)std::atof(list[3].c_str());
+                value = glm::vec3(
+                    (float) std::atof(list[1].c_str()),
+                    (float) std::atof(list[2].c_str()),
+                    (float) std::atof(list[3].c_str())
+                );
                 return true;
             }
         },
         {
             "vec4",
             [&]() -> bool {
-                value.type = UniformValue::TYPE_VECTOR4;
-                value.vector4[0] = (float)std::atof(list[1].c_str());
-                value.vector4[1] = (float)std::atof(list[2].c_str());
-                value.vector4[2] = (float)std::atof(list[3].c_str());
-                value.vector4[3] = (float)std::atof(list[4].c_str());
+                value = glm::vec4(
+                    (float) std::atof(list[1].c_str()),
+                    (float) std::atof(list[2].c_str()),
+                    (float) std::atof(list[3].c_str()),
+                    (float) std::atof(list[4].c_str())
+                );
                 return true;
             }
         },
         {
             "int",
             [&]() -> bool {
-                value.type = UniformValue::TYPE_INTEGER;
-                value.integer = (int)std::atoi(list[1].c_str());
+                value = (int)std::atoi(list[1].c_str());
+                return true;
+            }
+        },
+        {
+            "mat3",
+            [&]() -> bool {
+                value = glm::mat3(1.0f);
                 return true;
             }
         },
         {
             "mat4",
             [&]() -> bool {
-                value.type = UniformValue::TYPE_MATRIX4;
-                glm::mat4 mat(1.0f);
-                memcpy(value.matrix4, glm::value_ptr(mat), sizeof(mat));
+                value = glm::mat4(1.0f);
                 return true;
             }
         }
