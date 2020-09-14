@@ -19,7 +19,6 @@ namespace sunty
 		{
 			AttrType type;
 			int columns = 0;
-			std::vector<float> data;
 			AttrDesc(AttrType type, int columns)
 			{
 				this->type = type;
@@ -30,9 +29,7 @@ namespace sunty
 		VertexBufferObject();
 		~VertexBufferObject();
 		void pushAttr(AttrType attrType, int columns);
-		void pushData(AttrType attrType, int rows, const float * data);
-		void setup();
-		void setup(const float * data, uint32_t size);
+		void setup(const float * data, uint32_t count);
 		void release();
 		void use(bool value);
 		int columns() { return mColumns; }

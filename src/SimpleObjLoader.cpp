@@ -75,8 +75,7 @@ static glm::vec3 _calcTangent(
 bool sunty::SimpleObjLoader::load(
 	const std::filesystem::path & path,
 	bool calcTangent,
-	VertexBufferObject & vbo, 
-	VertexArrayObject & vao)
+	Mesh & mesh)
 {
 	std::ifstream stream;
 
@@ -244,30 +243,18 @@ bool sunty::SimpleObjLoader::load(
 	normals.clear();
 	indicesMap.clear();
 
-	// for (int k = 0; k < alignedVertices.size(); ++k)
-	// {
-	// 	printf("%d: %f %f %f\n", k, alignedVertices[k].v.x, alignedVertices[k].v.y, alignedVertices[k].v.z);
-	// }
-	// for (int k = 0; k < faces.size(); ++k)
-	// {
-	// 	printf("%d %d %d\n", faces[k].i[0], faces[k].i[1], faces[k].i[2]);
-	// }
+	mesh.pushAttr(Mesh::AttrType::ATTR_POSITION, 3);
+	mesh.pushAttr(Mesh::AttrType::ATTR_TEXTURE_COORD, 2);
+	mesh.pushAttr(Mesh::AttrType::ATTR_NORMAL, 3);
+	mesh.pushAttr(Mesh::AttrType::ATTR_TANGENT, 3);
 
-	vbo.pushAttr(VertexBufferObject::AttrType::ATTR_POSITION, 3);
-	vbo.pushAttr(VertexBufferObject::AttrType::ATTR_TEXTURE_COORD, 2);
-	vbo.pushAttr(VertexBufferObject::AttrType::ATTR_NORMAL, 3);
-	vbo.pushAttr(VertexBufferObject::AttrType::ATTR_TANGENT, 3);
+	mesh.setup(
+		(const float *) alignedVertices.data(),
+		alignedVertices.size() * (sizeof(alignedVertices[0]) / sizeof(float)),
+		(const int *) faces.data(),
+		faces.size() * (sizeof(faces[0]) / sizeof(uint32_t))
+	);
 
-	const float * buffer = (const float *)alignedVertices.data();
-	vbo.setup(
-		buffer,
-		alignedVertices.size() * (sizeof(alignedVertices[0]) / sizeof(float))
-	);
-	vao.pushIndices(
-		faces.size() * (sizeof(faces[0]) / sizeof(uint32_t)),
-		(int *)faces.data()
-	);
-	vao.setup();
 	printf("obj model %s loaded successfully\n", path.string().c_str());
 	return true;
 }

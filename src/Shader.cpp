@@ -6,28 +6,27 @@ Shader::Shader()
 {
 }
 
-
 Shader::~Shader()
 {
     release();
 }
 
-
-void Shader::setup(const char * vertexCode, const char * fragmentCode)
+bool Shader::setup(const char * vertexCode, const char * fragmentCode)
 {
+    const char * searchPaths[] = { "/" };
     auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    GLint vertCompiled = 0;
+    GLint fragCompiled = 0;
+    GLint isLinked = 0;
+
     glShaderSource(vertex_shader, 1, &vertexCode, NULL);
-    const char * searchPaths[] =
-    {
-        "/",
-    };
     glCompileShaderIncludeARB(
         vertex_shader,
         sizeof(searchPaths) / sizeof(searchPaths[0]),
         searchPaths,
         nullptr
     );
-    GLint vertCompiled = 0;
     glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &vertCompiled);
     if (vertCompiled == GL_FALSE)
     {
@@ -41,9 +40,9 @@ void Shader::setup(const char * vertexCode, const char * fragmentCode)
             infoLog.data()
         );
         printf("VertShader Compile Err: %s\n", infoLog.data());
+        goto SETUP_ERROR;
     }
 
-    auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &fragmentCode, NULL);
     glCompileShaderIncludeARB(
         fragment_shader,
@@ -51,7 +50,6 @@ void Shader::setup(const char * vertexCode, const char * fragmentCode)
         searchPaths,
         nullptr
     );
-    GLint fragCompiled = 0;
     glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &fragCompiled);
     if (fragCompiled == GL_FALSE)
     {
@@ -65,6 +63,7 @@ void Shader::setup(const char * vertexCode, const char * fragmentCode)
             infoLog.data()
         );
         printf("FragShader Compile Err: %s\n", infoLog.data());
+        goto SETUP_ERROR;
     }
 
     mProgram = glCreateProgram();
@@ -72,7 +71,6 @@ void Shader::setup(const char * vertexCode, const char * fragmentCode)
     glAttachShader(mProgram, fragment_shader);
     glLinkProgram(mProgram);
 
-    GLint isLinked = 0;
     glGetProgramiv(mProgram, GL_LINK_STATUS, &isLinked);
     if (isLinked == GL_FALSE)
     {
@@ -88,10 +86,17 @@ void Shader::setup(const char * vertexCode, const char * fragmentCode)
         // The program is useless now. So delete it.
         glDeleteProgram(mProgram);
         mProgram = 0;
+        goto SETUP_ERROR;
     }
 
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
+    return true;
+
+SETUP_ERROR:
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
+    return false;
 }
 
 
@@ -198,7 +203,7 @@ bool Shader::setUniformMatrix4(const char * name, const float * value)
 bool Shader::setAttribute(
     const char * name, 
     VertexBufferObject::AttrType attrType, 
-    VertexBufferObject & vertexBuffer)
+    Mesh & mesh)
 {
     auto loc = getAttributeLocation(name);
     if (loc == -1)
@@ -206,7 +211,7 @@ bool Shader::setAttribute(
         return false;
     }
     int offset = 0;
-    for (auto & desc : vertexBuffer.attrDescs())
+    for (auto & desc : mesh.attrDescs())
     {
         if (desc.type != attrType)
         {
@@ -219,7 +224,7 @@ bool Shader::setAttribute(
             desc.columns,
             GL_FLOAT,
             GL_FALSE,
-            vertexBuffer.columns() * sizeof(float),
+            mesh.columns() * sizeof(float),
             (void *) (offset * sizeof(float))
         );
         break;

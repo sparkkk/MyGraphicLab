@@ -3,26 +3,23 @@
 using namespace sunty;
 
 void RenderObject::setup(
-	std::shared_ptr<VertexBufferObject> vbo, 
-	std::shared_ptr<VertexArrayObject> vao, 
+	std::shared_ptr<Mesh> mesh,
 	std::shared_ptr<Shader> shader,
 	RenderOptions options)
 {
-	mVBO = vbo;
-	mVAO = vao;
+	mMesh = mesh;
 	mShader = shader;
 	mOptions = options;
 
 	mShader->use(true);
-	mVAO->use(true);
-	mVBO->use(true);
+	mMesh->use(true);
+	auto& vbo = mMesh;
 	mShader->setAttribute("Position", VertexBufferObject::AttrType::ATTR_POSITION, *vbo);
 	mShader->setAttribute("Color", VertexBufferObject::AttrType::ATTR_COLOR, *vbo);
 	mShader->setAttribute("Coord", VertexBufferObject::AttrType::ATTR_TEXTURE_COORD, *vbo);
 	mShader->setAttribute("Normal", VertexBufferObject::AttrType::ATTR_NORMAL, *vbo);
 	mShader->setAttribute("Tangent", VertexBufferObject::AttrType::ATTR_TANGENT, *vbo);
-	mVBO->use(false);
-	mVAO->use(false);
+	mMesh->use(false);
 	mShader->use(false);
 }
 
@@ -113,21 +110,23 @@ void sunty::RenderObject::draw()
 				++textureCounter;
 				break;
 			}
+			default:
+				break;
 		}
 	}
 
-	mVAO->use(true);
+	mMesh->use(true);
 	switch (mOptions.drawMode)
 	{
 	case RenderOptions::DRAW_LIST:
-		mVAO->drawTriangles();
+		mMesh->drawTriangles();
 		break;
 	case RenderOptions::DRAW_STRIP:
-		mVAO->drawTriangleStrip();
+		mMesh->drawTriangleStrip();
 		break;
 	default:
 		break;
 	}
-	mVAO->use(false);
+	mMesh->use(false);
 	mShader->use(false);
 }

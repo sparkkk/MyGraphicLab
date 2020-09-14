@@ -1,8 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include "VertexBufferObject.h"
-
+#include "Mesh.h"
 
 namespace sunty
 {
@@ -11,7 +10,7 @@ namespace sunty
 	public:
 		Shader();
 		~Shader();
-		void setup(const char * vertexCode, const char * fragmentCode);
+		bool setup(const char * vertexCode, const char * fragmentCode);
 		void release();
 		void use(bool value);
 		bool hasUniform(const char * name);
@@ -22,7 +21,7 @@ namespace sunty
 		bool setUniformVector4(const char * name, const float * value);
 		bool setUniformMatrix3(const char * name, const float * value);
 		bool setUniformMatrix4(const char * name, const float * value);
-		bool setAttribute(const char * name, VertexBufferObject::AttrType attrType, VertexBufferObject & vertexBuffer);
+		bool setAttribute(const char * name, Mesh::AttrType attrType, Mesh & mesh);
 		void enableAttribute(const char * name);
 		void disableAttribute(const char * name);
 	private:

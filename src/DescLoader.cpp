@@ -271,8 +271,7 @@ struct ParseContext
     DescLoader * loader = nullptr;
     RenderOptions options;
     std::shared_ptr<Shader> shader;
-    std::shared_ptr<VertexBufferObject> vbo;
-    std::shared_ptr<VertexArrayObject> vao;
+    std::shared_ptr<Mesh> mesh;
     std::unordered_map<std::string, UniformValue> uniforms;
     std::vector<Camera> cameras;
     std::unordered_map<std::string, JDRenderGroupItem> renderGroupMap;
@@ -322,16 +321,14 @@ static bool parseShader(ParseContext & context, const JDShader & jd)
 
 static bool parseMesh(ParseContext & context, const JDMesh & jd)
 {
-    context.vbo = std::make_shared<VertexBufferObject>();
-    context.vao = std::make_shared<VertexArrayObject>();
+    context.mesh = std::make_shared<Mesh>();
     if (jd.type == "obj")
     {
         SimpleObjLoader loader;
         loader.load(
             context.loader->assembllyPath(jd.path),
             true,
-            *context.vbo,
-            *context.vao
+            *context.mesh
         );
         return true;
     }
@@ -783,8 +780,7 @@ bool sunty::DescLoader::loadRenderObject(
     }
 
     render.setup(
-        context.vbo,
-        context.vao,
+        context.mesh,
         context.shader,
         context.options
     );

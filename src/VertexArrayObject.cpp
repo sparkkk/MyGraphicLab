@@ -13,22 +13,15 @@ VertexArrayObject::~VertexArrayObject()
 }
 
 
-void VertexArrayObject::pushIndices(int count, int * indices)
-{
-	mIndices.assign(indices, indices + count);
-}
-
-
-void VertexArrayObject::setup()
+void VertexArrayObject::setup(const int * indices, size_t count)
 {
 	glGenVertexArrays(1, &mVAO);
 	glBindVertexArray(mVAO);
 
 	glGenBuffers(1, &mEBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mIndices.size(), mIndices.data(), GL_STATIC_DRAW);
-	mElementCount = mIndices.size();
-	mIndices.clear();
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) *count, indices, GL_STATIC_DRAW);
+	mElementCount = count;
 }
 
 
@@ -44,7 +37,6 @@ void VertexArrayObject::release()
 		glDeleteVertexArrays(1, &mVAO);
 		mVAO = 0;
 	}
-	mIndices.clear();
 	mElementCount = 0;
 }
 
