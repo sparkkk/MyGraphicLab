@@ -1,11 +1,11 @@
 #pragma once
 
 #include "common.h"
-
+#include "IResource.h"
 
 namespace sunty
 {
-    class Texture
+    class Texture : public IResource
     {
     public:
         enum PixelLayout

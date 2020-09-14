@@ -1,11 +1,12 @@
 #pragma once
 
 #include "common.h"
+#include "IResource.h"
 #include "Mesh.h"
 
 namespace sunty
 {
-	class Shader
+	class Shader : public IResource
 	{
 	public:
 		Shader();

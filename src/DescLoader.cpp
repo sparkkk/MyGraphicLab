@@ -1,8 +1,8 @@
 #include "DescLoader.h"
 #include "nlohmann/json.hpp"
-#include "SimpleObjLoader.h"
-#include "ImageUtils.h"
 #include "RenderGroup.h"
+#include "Context.h"
+#include "Cubemap.h"
 
 using namespace sunty;
 using namespace nlohmann;
@@ -305,17 +305,15 @@ static bool parseRenderOptions(ParseContext & context, const JDRenderOptions & j
 
 static bool parseShader(ParseContext & context, const JDShader & jd)
 {
-    context.shader = std::make_shared<Shader>();
-    std::string vertCode, fragCode;
-    if (!loadText(context.loader->assembllyPath(jd.pathVert), vertCode))
+    auto shader = Context::get().resource().queryShader(
+        context.loader->assembllyPath(jd.pathVert),
+        context.loader->assembllyPath(jd.pathFrag)
+    );
+    if (shader == nullptr)
     {
         return false;
     }
-    if (!loadText(context.loader->assembllyPath(jd.pathFrag), fragCode))
-    {
-        return false;
-    }
-    context.shader->setup(vertCode.c_str(), fragCode.c_str());
+    context.shader = std::static_pointer_cast<Shader>(shader);
     return true;
 }
 
@@ -324,17 +322,16 @@ static bool parseMesh(ParseContext & context, const JDMesh & jd)
     context.mesh = std::make_shared<Mesh>();
     if (jd.type == "obj")
     {
-        SimpleObjLoader loader;
-        loader.load(
+        auto mesh = Context::get().resource().queryMesh(
             context.loader->assembllyPath(jd.path),
-            true,
-            *context.mesh
+            true
         );
+        if (mesh == nullptr)
+        {
+            return false;
+        }
+        context.mesh = std::static_pointer_cast<Mesh>(mesh);
         return true;
-    }
-    else if (jd.type == "simple")
-    {
-        return false;
     }
     else
     {
@@ -350,23 +347,23 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
             "texture",
             [&]() -> bool {
                 std::string type = list[1];
-                auto texture = std::make_shared<Texture>();
                 if (type == "file")
                 {
-                    if (!loadPngTexture(
+                    auto texture = Context::get().resource().queryTexture(
                         context.loader->assembllyPath(list[2]),
-                        list[3].c_str(),
-                        *texture
-                    ))
+                        list[3].c_str()
+                    );
+                    if (texture == nullptr)
                     {
                         return false;
                     }
                     value.type = UniformValue::TYPE_TEXTURE;
-                    value.texture = texture;
+                    value.texture = std::static_pointer_cast<Texture>(texture);
                     return true;
                 }
                 else if (type == "built-in")
                 {
+                    auto texture = std::make_shared<Texture>();
                     int color[3] = {0};
                     if (list[2] == "black")
                     {
@@ -437,6 +434,7 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
                 }
                 else if (type == "rgb")
                 {
+                    auto texture = std::make_shared<Texture>();
                     float color[3] = { 0 };
                     color[0] = (float) std::atof(list[2].c_str());
                     color[1] = (float) std::atof(list[3].c_str());
@@ -472,19 +470,18 @@ static bool parseUniformValue(ParseContext & context, const std::vector<std::str
             "cubemap",
             [&]() -> bool {
                 std::string type = list[1];
-                auto cubemap = std::make_shared<Cubemap>();
                 if (type == "file")
                 {
-                    if (!loadPngCubemap(
+                    auto cubemap = Context::get().resource().queryCubemap(
                         context.loader->assembllyPath(list[2]),
-                        list[3].c_str(),
-                        *cubemap
-                    ))
+                        list[3].c_str()
+                    );
+                    if (cubemap == nullptr)
                     {
                         return false;
                     }
                     value.type = UniformValue::TYPE_TEXTURE;
-                    value.texture = cubemap;
+                    value.texture = std::static_pointer_cast<Cubemap>(cubemap);
                     return true;
                 }
                 else

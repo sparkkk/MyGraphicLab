@@ -1,11 +1,12 @@
 #pragma once
 #include "common.h"
+#include "IResource.h"
 #include "VertexBufferObject.h"
 #include "VertexArrayObject.h"
 
 namespace sunty
 {
-    class Mesh : public VertexBufferObject, public VertexArrayObject
+    class Mesh : public IResource, public VertexBufferObject, public VertexArrayObject
     {
 	public:
 		Mesh() = default;
