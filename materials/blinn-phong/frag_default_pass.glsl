@@ -39,10 +39,10 @@ void main()
         switch (Light.Lights[i].Type)
         {
         case LIGHT_TYPE_D:
-            color += calcPhongLightD(lightParam, geomParam, matParam);
+            color += calcBlinnPhongLightD(lightParam, geomParam, matParam);
             break;
         case LIGHT_TYPE_P:
-            color += calcPhongLightP(lightParam, geomParam, matParam);
+            color += calcBlinnPhongLightP(lightParam, geomParam, matParam);
             break;
         }
     }

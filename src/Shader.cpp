@@ -17,7 +17,16 @@ void Shader::setup(const char * vertexCode, const char * fragmentCode)
 {
     auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertexCode, NULL);
-    glCompileShader(vertex_shader);
+    const char * searchPaths[] =
+    {
+        "/",
+    };
+    glCompileShaderIncludeARB(
+        vertex_shader,
+        sizeof(searchPaths) / sizeof(searchPaths[0]),
+        searchPaths,
+        nullptr
+    );
     GLint vertCompiled = 0;
     glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &vertCompiled);
     if (vertCompiled == GL_FALSE)
@@ -36,7 +45,12 @@ void Shader::setup(const char * vertexCode, const char * fragmentCode)
 
     auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &fragmentCode, NULL);
-    glCompileShader(fragment_shader);
+    glCompileShaderIncludeARB(
+        fragment_shader,
+        sizeof(searchPaths) / sizeof(searchPaths[0]),
+        searchPaths,
+        nullptr
+    );
     GLint fragCompiled = 0;
     glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &fragCompiled);
     if (fragCompiled == GL_FALSE)

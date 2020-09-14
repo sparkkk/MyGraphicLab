@@ -86,6 +86,32 @@ protected:
 	}
 	bool initGL()
 	{
+		std::filesystem::path searchRoot = "../materials/include";
+		for (auto & entry : std::filesystem::recursive_directory_iterator(searchRoot))
+		{
+			if (!entry.is_regular_file())
+			{
+				continue;
+			}
+			if (entry.path().extension() != ".glsl")
+			{
+				continue;
+			}
+			std::string text;
+			if (loadText(entry.path(), text))
+			{
+				auto relativePath = entry.path().lexically_relative(searchRoot);
+				std::string name = std::string("/") + relativePath.string();
+				glNamedStringARB(
+					GL_SHADER_INCLUDE_ARB,
+					name.size(),
+					name.c_str(), 
+					text.size(),
+					text.c_str()
+				);
+			}
+		}
+
 		if (mStarter.drawerType == DRAWER_TYPE_FORWARD)
 		{
 			mDrawer.reset(new SimpleForwardDrawer);

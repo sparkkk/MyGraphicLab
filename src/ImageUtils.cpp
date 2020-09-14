@@ -5,6 +5,23 @@
 namespace sunty
 {
 
+bool loadText(const std::filesystem::path & path, std::string & text)
+{
+    std::ifstream stream;
+    stream.open(path);
+    if (!stream.is_open())
+    {
+        return false;
+    }
+    auto size = std::streamoff(stream.seekg(0, std::ios::end).tellg());
+    text.resize(size + 1);
+    stream.seekg(0, std::ios::beg);
+    stream.read(const_cast<char*>(text.data()), size);
+    text[size] = 0;
+    stream.close();
+    return true;
+}
+
 static std::vector<uint8_t> flipImage(const std::vector<uint8_t> & image, int stride, int height)
 {
     std::vector<uint8_t> flip;

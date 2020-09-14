@@ -9,8 +9,8 @@
   },
   "shader": {
     "type": "glsl",
-    "pathVert": "vert.glsl",
-    "pathFrag": "frag.glsl"
+    "pathVert": "vert_geometry_pass.glsl",
+    "pathFrag": "frag_geometry_pass.glsl"
   },
   "mesh": {
     "type": "obj",
@@ -32,7 +32,7 @@
       },
       {
         "id": "Material.SpecularShiness",
-        "value": ["scalar", "128.0"]
+        "value": ["scalar", "128"]
       }
     ]
   }

@@ -266,23 +266,6 @@ void from_json(const json& j, JDScene& jd)
     JD_FROM_JSON(lights);
 }
 
-static bool loadFile(const std::filesystem::path & path, std::string & text)
-{
-    std::ifstream stream;
-    stream.open(path);
-    if (!stream.is_open())
-    {
-        return false;
-    }
-    auto size = std::streamoff(stream.seekg(0, std::ios::end).tellg());
-    text.resize(size + 1);
-    stream.seekg(0, std::ios::beg);
-    stream.read(const_cast<char*>(text.data()), size);
-    text[size] = 0;
-    stream.close();
-    return true;
-}
-
 struct ParseContext
 {
     DescLoader * loader = nullptr;
@@ -325,11 +308,11 @@ static bool parseShader(ParseContext & context, const JDShader & jd)
 {
     context.shader = std::make_shared<Shader>();
     std::string vertCode, fragCode;
-    if (!loadFile(context.loader->assembllyPath(jd.pathVert), vertCode))
+    if (!loadText(context.loader->assembllyPath(jd.pathVert), vertCode))
     {
         return false;
     }
-    if (!loadFile(context.loader->assembllyPath(jd.pathFrag), fragCode))
+    if (!loadText(context.loader->assembllyPath(jd.pathFrag), fragCode))
     {
         return false;
     }

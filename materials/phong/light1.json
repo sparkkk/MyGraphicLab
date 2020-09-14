@@ -3,6 +3,10 @@
   "type": "point",
   "uniforms": [
     {
+      "id": "Light.Lights[n].Type",
+      "value": ["int", "1"]
+    },
+    {
       "id": "Light.Lights[n].Position",
       "value": ["vec3", "0", "0", "10"]
     },

@@ -3,20 +3,38 @@
   "cameras": [
     {
       "type": "perspect",
-      "pass": [ "default" ],
+      "pass": ["default", "geometry"],
       "fan": 60,
-      "range": [10.0, 100.0],
+      "range": [1.0, 1000.0],
       "at": [0, 0, 20],
       "look": [0, 0, 0],
       "up": [0, 1, 0],
       "flipY": false
+    },
+    {
+      "type": "identity",
+      "pass": ["lighting"]
+    }
+  ],
+  "renderGroups": [
+    {
+      "name": "toad",
+      "renders": [
+        {
+          "path": "render-default-pass.json",
+          "pass": ["default"]
+        },
+        {
+          "path": "render-geometry-pass.json",
+          "pass": ["geometry"]
+        }
+      ]
     }
   ],
   "renders": [
     {
-      "path": "render1.json",
-      "pass": [ "default" ],
-      "follow": false,
+      "group": "toad",
+      "pass": ["default", "geometry"],
       "transforms": [
         {
           "type": "scale",
@@ -43,9 +61,8 @@
       ]
     },
     {
-      "path": "render1.json",
-      "pass": [ "default" ],
-      "follow": false,
+      "group": "toad",
+      "pass": ["default", "geometry"],
       "transforms": [
         {
           "type": "scale",
@@ -74,12 +91,15 @@
           "value": ["texture", "built-in", "yellow"]
         }
       ]
+    },
+    {
+      "path": "render-lighting-pass.json",
+      "pass": ["lighting"]
     }
   ],
   "lights": [
     {
-      "path": "light1.json",
-      "uniforms": []
+      "path": "light2.json"
     }
   ]
 }
