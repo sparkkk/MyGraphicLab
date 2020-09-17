@@ -20,12 +20,14 @@ static std::map<std::string, Pass> sPassMap =
     { "default", PASS_DEFAULT },
     { "geometry", PASS_GEOMETRY },
     { "lighting", PASS_LIGHTING },
+    { "depth1", PASS_DEPTH_1 },
 };
 
 static std::map<std::string, DrawerType> sDrawerTypeMap =
 {
     { "forward", DRAWER_TYPE_FORWARD },
     { "deferred", DRAWER_TYPE_DEFERRED },
+    { "shadowedForward", DRAWER_TYPE_SHADOWED_FORWARD },
 };
 
 static Pass parsePass(const std::vector<std::string> & pass)
@@ -160,6 +162,7 @@ struct JDCameraItem
     std::vector<std::string> pass;
     float fan = 0;
     float width = 0;
+    float aspect = 0;
     std::vector<float> range;
     std::vector<float> at;
     std::vector<float> look;
@@ -173,6 +176,7 @@ void from_json(const json& j, JDCameraItem& jd)
     JD_FROM_JSON(pass);
     JD_FROM_JSON(fan);
     JD_FROM_JSON(width);
+    JD_FROM_JSON(aspect);
     JD_FROM_JSON(range);
     JD_FROM_JSON(at);
     JD_FROM_JSON(look);
@@ -582,7 +586,7 @@ static bool parseMaterial(ParseContext & context, const JDMaterial & jd)
 static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
 {
     auto & config = context.loader->config;
-    float aspect = (float) config.width / (float) config.height;
+    float aspect = jd.aspect > 0 ? jd.aspect : (float) config.width / (float) config.height;
 
     if (jd.type == "perspect")
     {

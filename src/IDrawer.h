@@ -14,7 +14,7 @@ namespace sunty
 		virtual void update(float delta) = 0;
 		virtual void draw() = 0;
 		virtual void release() = 0;
-		virtual std::shared_ptr<RenderTarget> renderTarget() = 0;
+		virtual std::shared_ptr<Texture> texture() = 0;
 	};
 }
 

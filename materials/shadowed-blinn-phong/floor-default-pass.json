@@ -1,0 +1,39 @@
+{
+  "version": "0.1",
+  "options": {
+    "alphaBlend": false,
+    "depthTest": true,
+    "depthMask": true,
+    "cullMode": "none",
+    "drawMode": "list"
+  },
+  "shader": {
+    "type": "glsl",
+    "pathVert": "vert_default_pass.glsl",
+    "pathFrag": "frag_default_pass.glsl"
+  },
+  "mesh": {
+    "type": "obj",
+    "path": "resource/quad.obj"
+  },
+  "material": {
+    "uniforms": [
+      {
+        "id": "Material.TextureNormal",
+        "value": ["texture", "rgb", "0.5", "0.5", "1.0"]
+      },
+      {
+        "id": "Material.TextureDiffuse",
+        "value": ["texture", "built-in", "red"]
+      },
+      {
+        "id": "Material.TextureSpecular",
+        "value": ["texture", "built-in", "white"]
+      },
+      {
+        "id": "Material.SpecularShiness",
+        "value": ["scalar", "32"]
+      }
+    ]
+  }
+}

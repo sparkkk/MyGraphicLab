@@ -11,7 +11,10 @@ void RenderGroup::setParam(const char * name, const UniformValue & value)
 {
     for (auto r : mRenders)
     {
-        r->setParam(name, value);
+        if (r->getPassMask() & passCurr)
+        {
+            r->setParam(name, value);
+        }
     }
 }
 

@@ -42,6 +42,10 @@ namespace sunty
 		{
 			return mTextures[index];
 		}
+		std::shared_ptr<Texture> depthTexture()
+		{
+			return mDepthTexture;
+		}
 		Options & options()
 		{
 			return mOptions;

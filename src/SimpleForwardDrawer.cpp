@@ -1,8 +1,6 @@
 #include "SimpleForwardDrawer.h"
 #include "DescLoader.h"
 
-#include "ImageUtils.h"
-
 using namespace sunty;
 
 SimpleForwardDrawer::SimpleForwardDrawer()
@@ -49,7 +47,7 @@ void sunty::SimpleForwardDrawer::init(const Starter & config)
 	canvasOptions.depthOption.width = width;
 	canvasOptions.depthOption.height = height;
 	canvasOptions.depthOption.pixelLayout = Texture::PL_DEPTH;
-	canvasOptions.depthOption.internalDataType = Texture::DT_BYTE;
+	canvasOptions.depthOption.inputDataType = Texture::DT_F32;
 
 	mCanvasRT.reset(new RenderTarget);
 	mCanvasRT->setup(canvasOptions);
@@ -77,7 +75,8 @@ void sunty::SimpleForwardDrawer::release()
 }
 
 
-std::shared_ptr<RenderTarget> sunty::SimpleForwardDrawer::renderTarget()
+std::shared_ptr<Texture> sunty::SimpleForwardDrawer::texture()
 {
-	return mCanvasRT;
+	return mCanvasRT->texture(0);
+	//return mCanvasRT->depthTexture();
 }

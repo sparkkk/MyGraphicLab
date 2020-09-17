@@ -131,7 +131,7 @@ void sunty::SimpleDeferredDrawer::release()
 	mLightingPassRT.reset();
 }
 
-std::shared_ptr<RenderTarget> sunty::SimpleDeferredDrawer::renderTarget()
+std::shared_ptr<Texture> sunty::SimpleDeferredDrawer::texture()
 {
-	return mLightingPassRT;
+	return mLightingPassRT->texture(0);
 }

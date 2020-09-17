@@ -1,0 +1,98 @@
+{
+  "version": "0.1",
+  "cameras": [
+    {
+      "type": "ortho",
+      "pass": ["depth1"],
+      "width": 64,
+      "aspect": 1.0,
+      "range": [1.0, 1000.0],
+      "at": [-10, 10, 10],
+      "look": [0, 0, 0],
+      "up": [0, 1, 0],
+      "flipY": false
+    },
+    {
+      "type": "perspect",
+      "pass": ["default"],
+      "fan": 60,
+      "range": [1.0, 1000.0],
+      "at": [0, 0, 20],
+      "look": [0, 0, 0],
+      "up": [0, 1, 0],
+      "flipY": false
+    }
+  ],
+  "renderGroups": [
+    {
+      "name": "toad",
+      "renders": [
+        {
+          "path": "toad-default-pass.json",
+          "pass": ["default"]
+        },
+        {
+          "path": "toad-depth-pass.json",
+          "pass": ["depth1"]
+        }
+      ]
+    }
+  ],
+  "renders": [
+    {
+      "group": "toad",
+      "pass": ["default", "depth1"],
+      "transforms": [
+        {
+          "type": "scale",
+          "value": ["15", "15", "15"]
+        },
+        {
+          "type": "rotate",
+          "value": ["* delta 60", "0", "1", "0"]
+        },
+        {
+          "type": "rotate",
+          "value": ["* delta 45", "1", "0", "0"]
+        }
+      ]
+    },
+    {
+      "path": "floor-default-pass.json",
+      "pass": ["default"],
+      "transforms": [
+        {
+          "type": "scale",
+          "value": ["10", "10", "10"]
+        },
+        {
+          "type": "rotate",
+          "value": ["-90", "1", "0", "0"]
+        },
+        {
+          "type": "translate",
+          "value": ["0", "-5", "0"]
+        }
+      ]
+    },
+    {
+      "path": "floor-default-pass.json",
+      "pass": ["default"],
+      "transforms": [
+        {
+          "type": "scale",
+          "value": ["10", "10", "10"]
+        },
+        {
+          "type": "translate",
+          "value": ["0", "0", "-5"]
+        }
+      ]
+    }
+  ],
+  "lights": [
+    {
+      "path": "light2.json"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "version": "0.1",
+  "options": {
+    "alphaBlend": false,
+    "depthTest": true,
+    "depthMask": true,
+    "cullMode": "back",
+    "drawMode": "list"
+  },
+  "shader": {
+    "type": "glsl",
+    "pathVert": "vert-depth-pass.glsl",
+    "pathFrag": "frag-depth-pass.glsl"
+  },
+  "mesh": {
+    "type": "obj",
+    "path": "resource/toad.obj"
+  },
+  "material": {
+    "uniforms": []
+  }
+}

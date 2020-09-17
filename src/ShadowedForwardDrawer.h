@@ -1,18 +1,16 @@
 #pragma once
+
 #include "common.h"
 #include "IDrawer.h"
-
-#include "RenderTarget.h"
 #include "Scene.h"
 
 namespace sunty
 {
-	class SimpleDeferredDrawer :
-		public IDrawer
-	{
-	public:
-		SimpleDeferredDrawer();
-		virtual ~SimpleDeferredDrawer();
+    class ShadowedForwardDrawer : public IDrawer
+    {
+    public:
+        ShadowedForwardDrawer() = default;
+        virtual ~ShadowedForwardDrawer() = default;
 		virtual void init(const Starter & config) override;
 		virtual void update(float delta) override;
 		virtual void draw() override;
@@ -20,8 +18,8 @@ namespace sunty
 		virtual std::shared_ptr<Texture> texture() override;
 	private:
 		Scene mScene;
-		std::shared_ptr<RenderTarget> mGeometryPassRT;
-		std::shared_ptr<RenderTarget> mLightingPassRT;
-	};
+		std::shared_ptr<RenderTarget> mDepthRT;
+		std::shared_ptr<RenderTarget> mCanvasRT;
 
+    };
 }

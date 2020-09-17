@@ -11,6 +11,7 @@
 
 #include "SimpleForwardDrawer.h"
 #include "SimpleDeferredDrawer.h"
+#include "ShadowedForwardDrawer.h"
 
 #include "DescLoader.h"
 
@@ -112,13 +113,20 @@ protected:
 			}
 		}
 
-		if (mStarter.drawerType == DRAWER_TYPE_FORWARD)
+		switch (mStarter.drawerType)
 		{
+		case DRAWER_TYPE_FORWARD:
 			mDrawer.reset(new SimpleForwardDrawer);
-		}
-		else if (mStarter.drawerType == DRAWER_TYPE_DEFERRED)
-		{
+			break;
+		case DRAWER_TYPE_DEFERRED:
 			mDrawer.reset(new SimpleDeferredDrawer);
+			break;
+		case DRAWER_TYPE_SHADOWED_FORWARD:
+			mDrawer.reset(new ShadowedForwardDrawer);
+			break;
+		default:
+			printf("invalid drawer type\n");
+			return false;
 		}
 		
 		mDrawer->init(mStarter);
@@ -136,8 +144,9 @@ protected:
 		//loadPngTexture("../materials/resource/castle.png", "RGB", *ttt);
 		mCanvasScene.renders.back()->setParam(
 			"Texture1",
-			mDrawer->renderTarget()->texture(0)
+			mDrawer->texture()
 			//ttt
+			//mDrawer->renderTarget()->depthTexture()
 		);
 
 		RenderTarget::Options windowOptions;

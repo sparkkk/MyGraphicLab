@@ -70,6 +70,10 @@ void sunty::RenderTarget::push()
 	{
 		glDrawBuffers(mMRT.size(), mMRT.data());
 	}
+	else if (!mOptions.externalFBO)
+	{
+		glDrawBuffer(GL_NONE);
+	}
 }
 
 void sunty::RenderTarget::clear()
