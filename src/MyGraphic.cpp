@@ -87,6 +87,13 @@ protected:
 	}
 	bool initGL()
 	{
+		GLint maxDrawBuffers = 0;
+		GLint maxColorAttachments = 0;
+		glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxDrawBuffers);
+		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
+		printf("GL_MAX_DRAW_BUFFERS: %d\n", maxDrawBuffers);
+		printf("GL_MAX_COLOR_ATTACHMENTS: %d\n", maxColorAttachments);
+		
 		std::filesystem::path searchRoot = "../materials/include";
 		for (auto & entry : std::filesystem::recursive_directory_iterator(searchRoot))
 		{
