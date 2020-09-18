@@ -1,0 +1,32 @@
+{
+    "version": "0.1",
+    "passes": [ "depth1", "default" ],
+    "renderTargets": [
+      {
+        "pass": "depth1",
+        "width": 1024,
+        "height": 1024,
+        "textures": 0,
+        "hasDepth": true
+      },
+      {
+        "pass": "default",
+        "textures": 1,
+        "hasDepth": true
+      }
+    ],
+    "links": [
+      {
+        "src": "depth1.camera.vp",
+        "dst": "default.shadow.vp"
+      },
+      {
+        "src": "depth1.texture.depth",
+        "dst": "default.shadow.depth"
+      },
+      {
+        "src": "default.texture.0",
+        "dst": "output"
+      }
+    ]
+  }

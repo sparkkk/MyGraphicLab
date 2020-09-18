@@ -16,5 +16,35 @@
     "type": "obj",
     "path": "resource/quad.obj"
   },
-  "material": {}
+  "material": {},
+  "aliases": [
+    {
+      "alias": "viewer_position",
+      "param": "ViewerPosition"
+    },
+    {
+      "alias": "gbuffer.0",
+      "param": "GBuffer.TextureWorldPosition"
+    },
+    {
+      "alias": "gbuffer.1",
+      "param": "GBuffer.TextureNormal"
+    },
+    {
+      "alias": "gbuffer.2",
+      "param": "GBuffer.TextureTangent"
+    },
+    {
+      "alias": "gbuffer.3",
+      "param": "GBuffer.TextureNormalMap"
+    },
+    {
+      "alias": "gbuffer.4",
+      "param": "GBuffer.TextureDiffuseMap"
+    },
+    {
+      "alias": "gbuffer.5",
+      "param": "GBuffer.TextureSpecularMap"
+    }
+  ]
 }

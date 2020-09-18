@@ -221,3 +221,15 @@ void Scene::setCurrentPass(Pass pass)
 	}
 	this->pass = pass;
 }
+
+Camera * Scene::getCameraByPass(Pass pass)
+{
+	for (auto & c : cameras)
+	{
+		if (c.pass & pass)
+		{
+			return &c;
+		}
+	}
+	return nullptr;
+}

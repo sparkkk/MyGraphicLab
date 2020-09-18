@@ -3,6 +3,7 @@
     "width": 800,
     "height": 600,
     "fps": 40,
-    "drawerType": "shadowedForward",
-    "path": "shadowed-blinn-phong/scene.json"
+    "drawerType": "pipeline",
+    "scene": "blinn-phong/scene.json",
+    "pipeline": "pipeline/forward.json"
 }

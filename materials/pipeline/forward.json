@@ -1,0 +1,17 @@
+{
+  "version": "0.1",
+  "passes": [ "default" ],
+  "renderTargets": [
+    {
+      "pass": "default",
+      "textures": 1,
+      "hasDepth": true
+    }
+  ],
+  "links": [
+    {
+      "src": "default.texture.0",
+      "dst": "output"
+    }
+  ]
+}

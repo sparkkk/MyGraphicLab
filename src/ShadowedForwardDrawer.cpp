@@ -11,9 +11,9 @@ void sunty::ShadowedForwardDrawer::init(const Starter & config)
 
 	DescLoader loader;
 	loader.searchPaths.emplace_back("../materials");
-	if (!loader.loadScene(config.path, config, mScene))
+	if (!loader.loadScene(config.scene, config, mScene))
 	{
-		printf("failed to load scene: %s\n", config.path.c_str());
+		printf("failed to load scene: %s\n", config.scene.c_str());
 		return;
 	}
 
@@ -85,7 +85,7 @@ void sunty::ShadowedForwardDrawer::init(const Starter & config)
         if (r->getPassMask() & PASS_DEFAULT)
         {
             r->setParam("LightVP", pCamera->getVP());
-            r->setParam("ShadowMap", mDepthRT->depthTexture());
+            r->setParam("DepthMap", mDepthRT->depthTexture());
         }
     }
 }

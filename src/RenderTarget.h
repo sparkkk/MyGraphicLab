@@ -11,14 +11,14 @@ namespace sunty
 	public:
 		struct Options
 		{
-			bool externalFBO;
-			GLuint externalFBOID;
-			int viewX, viewY, viewW, viewH;
-			glm::vec4 clearColor;
-			float clearDepth;
-			int textureCount;
+			bool externalFBO = false;
+			GLuint externalFBOID = 0;
+			int viewX = 0, viewY = 0, viewW = 0, viewH = 0;
+			glm::vec4 clearColor = glm::vec4(0,0,0,1);
+			float clearDepth = 1.0f;
+			int textureCount = 0;
 			Texture::Option textureOptions[8];
-			bool hasDepth;
+			bool hasDepth = false;
 			Texture::Option depthOption;
 		};
 	public:

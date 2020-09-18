@@ -12,6 +12,7 @@
 #include "SimpleForwardDrawer.h"
 #include "SimpleDeferredDrawer.h"
 #include "ShadowedForwardDrawer.h"
+#include "PipelineDrawer.h"
 
 #include "DescLoader.h"
 
@@ -93,7 +94,7 @@ protected:
 		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
 		printf("GL_MAX_DRAW_BUFFERS: %d\n", maxDrawBuffers);
 		printf("GL_MAX_COLOR_ATTACHMENTS: %d\n", maxColorAttachments);
-		
+
 		std::filesystem::path searchRoot = "../materials/include";
 		for (auto & entry : std::filesystem::recursive_directory_iterator(searchRoot))
 		{
@@ -130,6 +131,9 @@ protected:
 			break;
 		case DRAWER_TYPE_SHADOWED_FORWARD:
 			mDrawer.reset(new ShadowedForwardDrawer);
+			break;
+		case DRAWER_TYPE_PIPELINE:
+			mDrawer.reset(new PipelineDrawer);
 			break;
 		default:
 			printf("invalid drawer type\n");
@@ -212,7 +216,7 @@ protected:
 		//printf("delta is %f sec\n", delta);
 		mDrawer->update(delta);
 		mDrawer->draw();
-		
+
 		mWindowRT->push();
 		mWindowRT->clear();
 		mCanvasScene.draw();

@@ -1,0 +1,61 @@
+{
+  "version": "0.1",
+  "passes": [
+    "geometry",
+    "lighting"
+  ],
+  "renderTargets": [
+    {
+      "pass": "geometry",
+      "textures": 8,
+      "hasDepth": true
+    },
+    {
+      "pass": "lighting",
+      "textures": 1,
+      "hasDepth": true
+    }
+  ],
+  "links": [
+    {
+      "src": "geometry.camera.pos",
+      "dst": "lighting.viewer_position"
+    },
+    {
+      "src": "geometry.texture.0",
+      "dst": "lighting.gbuffer.0"
+    },
+    {
+      "src": "geometry.texture.1",
+      "dst": "lighting.gbuffer.1"
+    },
+    {
+      "src": "geometry.texture.2",
+      "dst": "lighting.gbuffer.2"
+    },
+    {
+      "src": "geometry.texture.3",
+      "dst": "lighting.gbuffer.3"
+    },
+    {
+      "src": "geometry.texture.4",
+      "dst": "lighting.gbuffer.4"
+    },
+    {
+      "src": "geometry.texture.5",
+      "dst": "lighting.gbuffer.5"
+    },
+    {
+      "src": "geometry.texture.6",
+      "dst": "lighting.gbuffer.6"
+    },
+    {
+      "src": "geometry.texture.7",
+      "dst": "lighting.gbuffer.7"
+    },
+    {
+      "src": "lighting.texture.0",
+      "dst": "output"
+    }
+  ]
+}

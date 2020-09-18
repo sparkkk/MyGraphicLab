@@ -28,6 +28,7 @@ static std::map<std::string, DrawerType> sDrawerTypeMap =
     { "forward", DRAWER_TYPE_FORWARD },
     { "deferred", DRAWER_TYPE_DEFERRED },
     { "shadowedForward", DRAWER_TYPE_SHADOWED_FORWARD },
+    { "pipeline", DRAWER_TYPE_PIPELINE },
 };
 
 static Pass parsePass(const std::vector<std::string> & pass)
@@ -124,6 +125,18 @@ void from_json(const json& j, JDMaterial& jd)
     JD_FROM_JSON(uniforms);
 }
 
+struct JDAliasItem
+{
+    std::string alias;
+    std::string param;
+};
+
+void from_json(const json& j, JDAliasItem& jd)
+{
+    JD_FROM_JSON(alias);
+    JD_FROM_JSON(param);
+}
+
 struct JDRender
 {
     std::string version;
@@ -131,6 +144,7 @@ struct JDRender
     JDShader shader;
     JDMesh mesh;
     JDMaterial material;
+    std::vector<JDAliasItem> aliases;
 };
 
 void from_json(const json& j, JDRender& jd)
@@ -140,6 +154,7 @@ void from_json(const json& j, JDRender& jd)
     JD_FROM_JSON(shader);
     JD_FROM_JSON(mesh);
     JD_FROM_JSON(material);
+    JD_FROM_JSON(aliases);
 }
 
 struct JDLight
@@ -795,6 +810,11 @@ bool sunty::DescLoader::loadRenderObject(
         render.setParam(id.c_str(), val);
     }
 
+    for (auto & aliasItem : jdRender.aliases)
+    {
+        render.pushAlias(aliasItem.alias, aliasItem.param);
+    }
+
     searchPaths.pop_back();
     
     return true;
@@ -931,7 +951,8 @@ struct JDStarter
     int height = 600;
     int fps = 40;
     std::string drawerType = "forward";
-    std::string path;
+    std::string scene;
+    std::string pipeline;
 };
 
 bool DescLoader::loadStarter(
@@ -951,13 +972,15 @@ bool DescLoader::loadStarter(
     JD_FROM_JSON(height);
     JD_FROM_JSON(fps);
     JD_FROM_JSON(drawerType);
-    JD_FROM_JSON(path);
+    JD_FROM_JSON(scene);
+    JD_FROM_JSON(pipeline);
 
     starter.width = jd.width;
     starter.height = jd.height;
     starter.fps = jd.fps;
     starter.drawerType = sDrawerTypeMap[jd.drawerType];
-    starter.path = jd.path;
+    starter.scene = jd.scene;
+    starter.pipeline = jd.pipeline;
     return true;
 }
 
@@ -987,4 +1010,133 @@ std::filesystem::path DescLoader::assembllyPath(const std::filesystem::path & pa
         }
     }
     return path;
+}
+
+struct JDRenderTarget
+{
+    std::string pass;
+    int width = 0;
+    int height = 0;
+    int textures = 0;
+    bool hasDepth = false;
+};
+
+void from_json(const json& j, JDRenderTarget& jd)
+{
+    JD_FROM_JSON(pass);
+    JD_FROM_JSON(width);
+    JD_FROM_JSON(height);
+    JD_FROM_JSON(textures);
+    JD_FROM_JSON(hasDepth);
+}
+
+struct JDLinkItem
+{
+    std::string src;
+    std::string dst;
+};
+
+void from_json(const json& j, JDLinkItem& jd)
+{
+    JD_FROM_JSON(src);
+    JD_FROM_JSON(dst);
+}
+
+struct JDPipeline
+{
+    std::string version;
+    std::vector<std::string> passes;
+    std::vector<JDRenderTarget> renderTargets;
+    std::vector<JDLinkItem> links;
+};
+
+void from_json(const json& j, JDPipeline& jd)
+{
+    JD_FROM_JSON(version);
+    JD_FROM_JSON(passes);
+    JD_FROM_JSON(renderTargets);
+    JD_FROM_JSON(links);
+}
+
+bool DescLoader::loadPipeline(
+    const std::filesystem::path & path,
+    const Starter & config,
+    Pipeline & pipeline)
+{
+    auto asbPath = assembllyPath(path);
+    std::ifstream streamIn(asbPath);
+    if (!streamIn.is_open())
+    {
+        return false;
+    }
+
+    this->config = config;
+
+    searchPaths.emplace_back(asbPath.parent_path());
+
+    json json;
+
+    streamIn >> json;
+
+    JDPipeline jdPipeline = json.get<JDPipeline>();
+
+    for (auto & p : jdPipeline.passes)
+    {
+        Pass pass = sPassMap[p];
+        pipeline.passes.push_back(pass);
+    }
+
+    std::unordered_map<Pass, std::shared_ptr<RenderTarget>> map;
+    for (auto & jdRT : jdPipeline.renderTargets)
+    {
+        Pass pass = sPassMap[jdRT.pass];
+        RenderTarget::Options options;
+        
+        int W = jdRT.width > 0 ? jdRT.width : config.width;
+        int H = jdRT.height > 0 ? jdRT.height : config.height;
+        options.externalFBO = false;
+        options.externalFBOID = 0;
+        options.textureCount = jdRT.textures;
+        for (int k = 0; k < options.textureCount; ++k)
+        {
+            options.textureOptions[k].width = W;
+            options.textureOptions[k].height = H;
+            options.textureOptions[k].pixelLayout = Texture::PL_RGBA;
+            options.textureOptions[k].internalDataType = Texture::DT_F16;
+        }
+        options.viewX = 0;
+        options.viewY = 0;
+        options.viewW = W;
+        options.viewH = H;
+        options.clearColor = glm::vec4(0, 0, 0, 1);
+        options.clearDepth = 1;
+        options.hasDepth = jdRT.hasDepth;
+        if (options.hasDepth)
+        {
+            options.depthOption.width = W;
+            options.depthOption.height = H;
+            options.depthOption.pixelLayout = Texture::PL_DEPTH;
+            options.depthOption.inputDataType = Texture::DT_F32;
+        }
+
+        auto rt = std::make_shared<RenderTarget>();
+        rt->setup(options);
+
+        map[pass] = rt;
+    }
+
+    for (Pass p : pipeline.passes)
+    {
+        pipeline.renderTargets.emplace_back(map[p]);
+    }
+
+    for (auto & jdLink : jdPipeline.links)
+    {
+        pipeline.links.emplace_back();
+        pipeline.links.back().src = jdLink.src;
+        pipeline.links.back().dst = jdLink.dst;
+    }
+
+    searchPaths.pop_back();
+    return true;
 }

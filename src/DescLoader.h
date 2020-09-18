@@ -3,6 +3,7 @@
 #include "common.h"
 #include "Scene.h"
 #include "RenderObject.h"
+#include "Pipeline.h"
 
 namespace sunty
 {
@@ -24,6 +25,11 @@ namespace sunty
 			const std::filesystem::path & path,
 			const Starter & config,
 			Scene & scene
+		);
+		bool loadPipeline(
+			const std::filesystem::path & path,
+			const Starter & config,
+			Pipeline & pipeline
 		);
 		bool loadStarter(
 			const std::filesystem::path & path,

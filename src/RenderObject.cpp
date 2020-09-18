@@ -25,9 +25,14 @@ void RenderObject::setup(
 
 void sunty::RenderObject::setParam(const char * name, const UniformValue & value)
 {
-	if (mShader->hasUniform(name))
+	std::string paramName = name;
+	if (mParamAlias.find(paramName) != mParamAlias.end())
 	{
-		mParams[name] = value;
+		paramName = mParamAlias[paramName];
+	}
+	if (mShader->hasUniform(paramName.c_str()))
+	{
+		mParams[paramName] = value;
 	}
 }
 

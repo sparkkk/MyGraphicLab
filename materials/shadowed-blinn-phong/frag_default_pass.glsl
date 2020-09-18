@@ -13,7 +13,7 @@ uniform MaterialUniform Material;
 
 uniform LightUniform Light;
 
-uniform sampler2D ShadowMap;
+uniform sampler2D DepthMap;
 
 layout (location = 0) out vec4 gColor;
 
@@ -26,18 +26,18 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    vec2 s = vec2(1.0) / textureSize(ShadowMap, 0);
+    vec2 s = vec2(1.0) / textureSize(DepthMap, 0);
     float bias = 0.005;
     float d = 0.0;
-    d += texture(ShadowMap, projCoords.xy + vec2(-s.x, -s.y)).r < currentDepth - bias ? 1.0 : 0.0;
-    d += texture(ShadowMap, projCoords.xy + vec2( 0.0, -s.y)).r < currentDepth - bias ? 1.0 : 0.0;
-    d += texture(ShadowMap, projCoords.xy + vec2(+s.x, -s.y)).r < currentDepth - bias ? 1.0 : 0.0;
-    d += texture(ShadowMap, projCoords.xy + vec2(-s.x,  0.0)).r < currentDepth - bias ? 1.0 : 0.0;
-    d += texture(ShadowMap, projCoords.xy + vec2( 0.0,  0.0)).r < currentDepth - bias ? 1.0 : 0.0;
-    d += texture(ShadowMap, projCoords.xy + vec2(+s.x,  0.0)).r < currentDepth - bias ? 1.0 : 0.0;
-    d += texture(ShadowMap, projCoords.xy + vec2(-s.x, +s.y)).r < currentDepth - bias ? 1.0 : 0.0;
-    d += texture(ShadowMap, projCoords.xy + vec2( 0.0, +s.y)).r < currentDepth - bias ? 1.0 : 0.0;
-    d += texture(ShadowMap, projCoords.xy + vec2(-s.x, +s.y)).r < currentDepth - bias ? 1.0 : 0.0;
+    d += texture(DepthMap, projCoords.xy + vec2(-s.x, -s.y)).r < currentDepth - bias ? 1.0 : 0.0;
+    d += texture(DepthMap, projCoords.xy + vec2( 0.0, -s.y)).r < currentDepth - bias ? 1.0 : 0.0;
+    d += texture(DepthMap, projCoords.xy + vec2(+s.x, -s.y)).r < currentDepth - bias ? 1.0 : 0.0;
+    d += texture(DepthMap, projCoords.xy + vec2(-s.x,  0.0)).r < currentDepth - bias ? 1.0 : 0.0;
+    d += texture(DepthMap, projCoords.xy + vec2( 0.0,  0.0)).r < currentDepth - bias ? 1.0 : 0.0;
+    d += texture(DepthMap, projCoords.xy + vec2(+s.x,  0.0)).r < currentDepth - bias ? 1.0 : 0.0;
+    d += texture(DepthMap, projCoords.xy + vec2(-s.x, +s.y)).r < currentDepth - bias ? 1.0 : 0.0;
+    d += texture(DepthMap, projCoords.xy + vec2( 0.0, +s.y)).r < currentDepth - bias ? 1.0 : 0.0;
+    d += texture(DepthMap, projCoords.xy + vec2(-s.x, +s.y)).r < currentDepth - bias ? 1.0 : 0.0;
     // check whether current frag pos is in shadow
     float shadow = d / 9.0;
 

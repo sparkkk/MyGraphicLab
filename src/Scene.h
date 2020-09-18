@@ -34,6 +34,7 @@ namespace sunty
 		void update(float delta);
 		void draw();
 		void setCurrentPass(Pass pass);
+		Camera * getCameraByPass(Pass pass);
 		std::vector<Camera> cameras;
 		std::vector<std::shared_ptr<IRenderObject>> renders;
 		std::vector<std::vector<Transform>> transforms;

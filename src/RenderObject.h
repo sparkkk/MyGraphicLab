@@ -20,11 +20,16 @@ namespace sunty
 		);
 		virtual void setParam(const char * name, const UniformValue & value) override;
 		virtual void draw() override;
+		void pushAlias(const std::string & alias, const std::string & param)
+		{
+			mParamAlias[alias] = param;
+		}
 	private:
 		std::shared_ptr<Mesh> mMesh;
 		std::unordered_map<std::string, UniformValue> mParams;
 		std::shared_ptr<Shader> mShader;
 		RenderOptions mOptions;
+		std::unordered_map<std::string, std::string> mParamAlias;
 	};
 }
 

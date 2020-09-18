@@ -20,7 +20,7 @@ void sunty::SimpleDeferredDrawer::init(const Starter & config)
 
 	DescLoader loader;
 	loader.searchPaths.emplace_back("../materials");
-	if (!loader.loadScene(config.path, config, mScene))
+	if (!loader.loadScene(config.scene, config, mScene))
 	{
 		printf("failed to load scene\n");
 	}

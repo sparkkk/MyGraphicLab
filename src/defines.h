@@ -24,6 +24,7 @@ namespace sunty
         DRAWER_TYPE_FORWARD,
         DRAWER_TYPE_DEFERRED,
         DRAWER_TYPE_SHADOWED_FORWARD,
+        DRAWER_TYPE_PIPELINE,
     };
 
     struct Starter
@@ -32,6 +33,7 @@ namespace sunty
         int height = 600;
         int fps = 40;
         DrawerType drawerType = DRAWER_TYPE_FORWARD;
-        std::string path;
+        std::string scene;
+        std::string pipeline;
     };
 }
