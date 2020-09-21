@@ -894,6 +894,7 @@ bool sunty::DescLoader::loadScene(
         {
             auto & id = entry.first;
             auto & value = entry.second;
+            context.renders.back()->setCurrentPass(context.renders.back()->getPassMask());
             context.renders.back()->setParam(id.c_str(), value);
         }
     }
