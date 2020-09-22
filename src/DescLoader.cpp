@@ -798,6 +798,7 @@ bool sunty::DescLoader::loadRenderObject(
     }
 
     render.setup(
+        path.string(),
         context.mesh,
         context.shader,
         context.options

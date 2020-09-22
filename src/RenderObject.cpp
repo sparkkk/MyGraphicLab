@@ -3,10 +3,12 @@
 using namespace sunty;
 
 void RenderObject::setup(
+	const std::string & name,
 	std::shared_ptr<Mesh> mesh,
 	std::shared_ptr<Shader> shader,
 	RenderOptions options)
 {
+	mName = name;
 	mMesh = mesh;
 	mShader = shader;
 	mOptions = options;
@@ -33,6 +35,10 @@ void sunty::RenderObject::setParam(const char * name, const UniformValue & value
 	if (mShader->hasUniform(paramName.c_str()))
 	{
 		mParams[paramName] = value;
+	}
+	else
+	{
+		//printf("RenderObject %s cannot find param %s=>%s\n", mName.c_str(), name, paramName.c_str());
 	}
 }
 

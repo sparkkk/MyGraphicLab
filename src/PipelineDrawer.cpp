@@ -115,9 +115,17 @@ bool PipelineDrawer::get(const std::string & id, UniformValue & value)
     Pass pass = sPassMap[ids[0]];
     if (ids[1] == "texture")
     {
-        int index = std::atoi(ids[2].c_str());
-        value = mPipeline.getRenderTargetByPass(pass)->texture(index);
-        return true;
+        if (ids[2] == "depth")
+        {
+            value = mPipeline.getRenderTargetByPass(pass)->depthTexture();
+            return true;
+        }
+        else
+        {
+            int index = std::atoi(ids[2].c_str());
+            value = mPipeline.getRenderTargetByPass(pass)->texture(index);
+            return true;
+        }
     }
     else if (ids[1] == "camera")
     {
@@ -153,9 +161,10 @@ bool PipelineDrawer::set(const std::string & id, const UniformValue & value)
     }
     Pass pass = sPassMap[ids[0]];
     std::string alias = join(ids, ".", 1);
+    mScene.setCurrentPass(pass);
     for (auto & r : mScene.renders)
     {
-        if (r->getPassMask() & pass)
+        if (r->getCurrentPass() == pass)
         {
             r->setParam(alias.c_str(), value);
         }

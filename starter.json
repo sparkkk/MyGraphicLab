@@ -4,6 +4,6 @@
     "height": 600,
     "fps": 40,
     "drawerType": "pipeline",
-    "scene": "pbr/scene.json",
-    "pipeline": "pipeline/deferred.json"
+    "scene": "skybox/scene.json",
+    "pipeline": "pipeline/forward.json"
 }

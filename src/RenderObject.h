@@ -14,6 +14,7 @@ namespace sunty
 		RenderObject() = default;
 		virtual ~RenderObject() = default;
 		void setup(
+			const std::string & name,
 			std::shared_ptr<Mesh> mesh,
 			std::shared_ptr<Shader> shader,
 			RenderOptions options
@@ -25,6 +26,7 @@ namespace sunty
 			mParamAlias[alias] = param;
 		}
 	private:
+		std::string mName;
 		std::shared_ptr<Mesh> mMesh;
 		std::unordered_map<std::string, UniformValue> mParams;
 		std::shared_ptr<Shader> mShader;

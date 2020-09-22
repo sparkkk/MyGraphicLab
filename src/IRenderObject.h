@@ -34,7 +34,11 @@ namespace sunty
 		virtual void draw() = 0;
         void setCurrentPass(Pass pass)
         {
-            passCurr = pass;
+            passCurr = (Pass) (pass & passMask);
+        }
+        Pass getCurrentPass()
+        {
+            return passCurr;
         }
         void setPassMask(Pass pass)
         {

@@ -35,5 +35,15 @@
         "value": ["scalar", "128"]
       }
     ]
-  }
+  },
+  "aliases": [
+    {
+      "alias": "shadow.vp",
+      "param": "LightVP"
+    },
+    {
+      "alias": "shadow.depth",
+      "param": "DepthMap"
+    }
+  ]
 }
