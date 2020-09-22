@@ -5,16 +5,16 @@
 
 namespace sunty
 {
-	class IDrawer
-	{
-	public:
-		IDrawer();
-		virtual ~IDrawer();
-		virtual void init(const Starter & config) = 0;
-		virtual void update(float delta) = 0;
-		virtual void draw() = 0;
-		virtual void release() = 0;
-		virtual std::shared_ptr<Texture> texture() = 0;
-	};
+    class IDrawer
+    {
+    public:
+        IDrawer();
+        virtual ~IDrawer();
+        virtual void init(const Starter & config) = 0;
+        virtual void update(float delta) = 0;
+        virtual void draw() = 0;
+        virtual void release() = 0;
+        virtual std::shared_ptr<Texture> texture() = 0;
+    };
 }
 

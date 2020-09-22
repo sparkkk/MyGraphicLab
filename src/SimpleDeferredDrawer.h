@@ -7,21 +7,21 @@
 
 namespace sunty
 {
-	class SimpleDeferredDrawer :
-		public IDrawer
-	{
-	public:
-		SimpleDeferredDrawer();
-		virtual ~SimpleDeferredDrawer();
-		virtual void init(const Starter & config) override;
-		virtual void update(float delta) override;
-		virtual void draw() override;
-		virtual void release() override;
-		virtual std::shared_ptr<Texture> texture() override;
-	private:
-		Scene mScene;
-		std::shared_ptr<RenderTarget> mGeometryPassRT;
-		std::shared_ptr<RenderTarget> mLightingPassRT;
-	};
+    class SimpleDeferredDrawer :
+        public IDrawer
+    {
+    public:
+        SimpleDeferredDrawer();
+        virtual ~SimpleDeferredDrawer();
+        virtual void init(const Starter & config) override;
+        virtual void update(float delta) override;
+        virtual void draw() override;
+        virtual void release() override;
+        virtual std::shared_ptr<Texture> texture() override;
+    private:
+        Scene mScene;
+        std::shared_ptr<RenderTarget> mGeometryPassRT;
+        std::shared_ptr<RenderTarget> mLightingPassRT;
+    };
 
 }

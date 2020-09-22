@@ -1,9 +1,9 @@
 {
-    "version": "0.1",
-    "width": 800,
-    "height": 600,
-    "fps": 40,
-    "drawerType": "pipeline",
-    "scene": "skybox/scene.json",
-    "pipeline": "pipeline/forward.json"
+  "version": "0.1",
+  "width": 800,
+  "height": 600,
+  "fps": 40,
+  "drawerType": "pipeline",
+  "scene": "skybox/scene.json",
+  "pipeline": "pipeline/forward.json"
 }
