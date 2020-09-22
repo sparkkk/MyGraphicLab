@@ -1,0 +1,57 @@
+{
+  "version": "0.1",
+  "options": {
+    "alphaBlend": false,
+    "depthTest": false,
+    "depthMask": false,
+    "cullMode": "none",
+    "drawMode": "list"
+  },
+  "shader": {
+    "type": "glsl",
+    "pathVert": "vert-lighting-pass.glsl",
+    "pathFrag": "frag-lighting-pass.glsl"
+  },
+  "mesh": {
+    "type": "obj",
+    "path": "resource/quad.obj"
+  },
+  "material": {
+    "uniforms": [
+      {
+        "id": "Exposure",
+        "value": ["scalar", "1.5"]
+      }
+    ]
+  },
+  "aliases": [
+    {
+      "alias": "viewer_position",
+      "param": "ViewerPosition"
+    },
+    {
+      "alias": "gbuffer.0",
+      "param": "GBuffer.TextureWorldPosition"
+    },
+    {
+      "alias": "gbuffer.1",
+      "param": "GBuffer.TextureNormal"
+    },
+    {
+      "alias": "gbuffer.2",
+      "param": "GBuffer.TextureTangent"
+    },
+    {
+      "alias": "gbuffer.3",
+      "param": "GBuffer.TextureNormalMap"
+    },
+    {
+      "alias": "gbuffer.4",
+      "param": "GBuffer.TextureAlbedoMap"
+    },
+    {
+      "alias": "gbuffer.5",
+      "param": "GBuffer.TextureMRAMap"
+    }
+  ]
+}

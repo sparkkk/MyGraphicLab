@@ -9,8 +9,8 @@
   },
   "shader": {
     "type": "glsl",
-    "pathVert": "vert.glsl",
-    "pathFrag": "frag.glsl"
+    "pathVert": "vert-geometry-pass.glsl",
+    "pathFrag": "frag-geometry-pass.glsl"
   },
   "mesh": {
     "type": "obj",
@@ -37,10 +37,6 @@
       {
         "id": "Material.TextureAmbientOcclusion",
         "value": ["texture", "rgb", "0", "0", "0"]
-      },
-      {
-        "id": "Exposure",
-        "value": ["scalar", "1.5"]
       }
     ]
   }
