@@ -13,29 +13,16 @@ Scene::~Scene()
 
 void Scene::setup()
 {
-    update(0);
+    updateCommon(0);
+    updatePass(0);
 
-    Camera * pCamera = nullptr;
-
-    for (auto & c : cameras)
-    {
-        if (c.pass & pass)
-        {
-            pCamera = &c;
-            break;
-        }
-    }
+    Camera * pCamera = getCameraByPass(pass);
     if (pCamera == nullptr)
     {
         return;
     }
 
-    auto flipper = glm::mat4(1.0);
     auto & camera = *pCamera;
-    if (camera.flipY)
-    {
-        flipper = glm::scale(glm::mat4(1.0), glm::vec3(1, -1, 1));
-    }
 
     for (int k = 0; k < renders.size(); ++k)
     {
@@ -44,19 +31,7 @@ void Scene::setup()
         {
             continue;
         }
-        auto & transform = matrices[k];
-        bool follow = follows[k];
 
-        auto mvp = flipper * camera.getVP() * transform;
-        if (follow)
-        {
-            auto mv = glm::mat4(glm::mat3(camera.getV() * transform));
-            mvp = flipper * camera.getP() * mv;
-        }
-
-        render->setParam("PositionTransform", mvp);
-        render->setParam("WorldTransform", transform);
-        render->setParam("ViewerPosition", camera.position);
         render->setParam("Light.LightCount", (int) lights.size());
 
         for (int i = 0; i < lights.size(); ++i)
@@ -123,7 +98,7 @@ static float evalExpr(
     return _evalExpr(valueMap, symbols, index);
 }
 
-void Scene::update(float delta)
+void Scene::updateCommon(float delta)
 {
     matrices.clear();
     valueMap["delta"] = delta;
@@ -157,17 +132,12 @@ void Scene::update(float delta)
         }
         matrices.emplace_back(transformMat);
     }
+}
 
-    Camera * pCamera = nullptr;
+void Scene::updatePass(float delta)
+{
+    Camera * pCamera = getCameraByPass(pass);
 
-    for (auto & c : cameras)
-    {
-        if (c.pass & pass)
-        {
-            pCamera = &c;
-            break;
-        }
-    }
     if (pCamera == nullptr)
     {
         return;
@@ -190,12 +160,17 @@ void Scene::update(float delta)
         auto & transform = matrices[k];
         bool follow = follows[k];
 
-        auto mvp = flipper * camera.getVP() * transform;
-        if (follow)
+        glm::mat4 mvp(1.0f);
+        if (!follow)
+        {
+            mvp = flipper * camera.getVP() * transform;
+        }
+        else
         {
             auto mv = glm::mat4(glm::mat3(camera.getV() * transform));
             mvp = flipper * camera.getP() * mv;
         }
+        render->setParam("ViewerPosition", camera.position);
         render->setParam("PositionTransform", mvp);
         render->setParam("WorldTransform", transform);
     }

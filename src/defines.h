@@ -21,9 +21,6 @@ namespace sunty
 
     enum DrawerType
     {
-        DRAWER_TYPE_FORWARD,
-        DRAWER_TYPE_DEFERRED,
-        DRAWER_TYPE_SHADOWED_FORWARD,
         DRAWER_TYPE_PIPELINE,
     };
 
@@ -32,7 +29,7 @@ namespace sunty
         int width = 800;
         int height = 600;
         int fps = 40;
-        DrawerType drawerType = DRAWER_TYPE_FORWARD;
+        DrawerType drawerType = DRAWER_TYPE_PIPELINE;
         std::string scene;
         std::string pipeline;
     };

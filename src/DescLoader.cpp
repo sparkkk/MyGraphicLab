@@ -25,9 +25,6 @@ static std::map<std::string, Pass> sPassMap =
 
 static std::map<std::string, DrawerType> sDrawerTypeMap =
 {
-    { "forward", DRAWER_TYPE_FORWARD },
-    { "deferred", DRAWER_TYPE_DEFERRED },
-    { "shadowedForward", DRAWER_TYPE_SHADOWED_FORWARD },
     { "pipeline", DRAWER_TYPE_PIPELINE },
 };
 
@@ -976,12 +973,16 @@ bool DescLoader::loadStarter(
     JD_FROM_JSON(scene);
     JD_FROM_JSON(pipeline);
 
+    if (sDrawerTypeMap.find(jd.drawerType) == sDrawerTypeMap.end())
+    {
+        return false;
+    }
     starter.width = jd.width;
     starter.height = jd.height;
     starter.fps = jd.fps;
-    starter.drawerType = sDrawerTypeMap[jd.drawerType];
     starter.scene = jd.scene;
     starter.pipeline = jd.pipeline;
+    starter.drawerType = sDrawerTypeMap[jd.drawerType];
     return true;
 }
 

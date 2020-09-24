@@ -33,10 +33,11 @@ void PipelineDrawer::init(const Starter & config)
 
 void PipelineDrawer::update(float delta)
 {
+    mScene.updateCommon(delta);
     for (Pass pass : mPipeline.passes)
     {
         mScene.setCurrentPass(pass);
-	    mScene.update(delta);
+	    mScene.updatePass(delta);
     }
 }
 

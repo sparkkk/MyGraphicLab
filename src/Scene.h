@@ -31,7 +31,8 @@ namespace sunty
         Scene();
         ~Scene();
         void setup();
-        void update(float delta);
+        void updateCommon(float delta);
+        void updatePass(float delta);
         void draw();
         void setCurrentPass(Pass pass);
         Camera * getCameraByPass(Pass pass);

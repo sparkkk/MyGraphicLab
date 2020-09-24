@@ -9,9 +9,6 @@
 #include "Scene.h"
 #include "RenderTarget.h"
 
-#include "SimpleForwardDrawer.h"
-#include "SimpleDeferredDrawer.h"
-#include "ShadowedForwardDrawer.h"
 #include "PipelineDrawer.h"
 
 #include "DescLoader.h"
@@ -123,15 +120,6 @@ protected:
 
         switch (mStarter.drawerType)
         {
-        case DRAWER_TYPE_FORWARD:
-            mDrawer.reset(new SimpleForwardDrawer);
-            break;
-        case DRAWER_TYPE_DEFERRED:
-            mDrawer.reset(new SimpleDeferredDrawer);
-            break;
-        case DRAWER_TYPE_SHADOWED_FORWARD:
-            mDrawer.reset(new ShadowedForwardDrawer);
-            break;
         case DRAWER_TYPE_PIPELINE:
             mDrawer.reset(new PipelineDrawer);
             break;
