@@ -35,5 +35,11 @@
         "value": ["scalar", "128"]
       }
     ]
-  }
+  },
+  "aliases": [
+    {
+      "alias": "viewer_position",
+      "param": "ViewerPosition"
+    }
+  ]
 }

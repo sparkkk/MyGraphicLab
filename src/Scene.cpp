@@ -170,7 +170,6 @@ void Scene::updatePass(float delta)
             auto mv = glm::mat4(glm::mat3(camera.getV() * transform));
             mvp = flipper * camera.getP() * mv;
         }
-        render->setParam("ViewerPosition", camera.position);
         render->setParam("PositionTransform", mvp);
         render->setParam("WorldTransform", transform);
     }

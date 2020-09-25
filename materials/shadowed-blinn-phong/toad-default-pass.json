@@ -44,6 +44,10 @@
     {
       "alias": "shadow.depth",
       "param": "DepthMap"
+    },
+    {
+      "alias": "viewer_position",
+      "param": "ViewerPosition"
     }
   ]
 }

@@ -25,6 +25,10 @@
         "dst": "default.shadow.depth"
       },
       {
+        "src": "default.camera.pos",
+        "dst": "default.viewer_position"
+      },
+      {
         "src": "default.texture.0",
         "dst": "output"
       }
