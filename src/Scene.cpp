@@ -32,10 +32,14 @@ void Scene::setup()
             continue;
         }
 
-        render->setParam("Light.LightCount", (int) lights.size());
-
+        int lightCount = 0;
         for (int i = 0; i < lights.size(); ++i)
         {
+            if ((lights[i].pass & pass) == 0)
+            {
+                continue;
+            }
+            ++lightCount;
             std::stringstream ss;
             ss << '[' << i << ']';
             std::string indexNote = ss.str();
@@ -53,6 +57,7 @@ void Scene::setup()
                 render->setParam(id.c_str(), value);
             }
         }
+        render->setParam("Light.LightCount", lightCount);
     }
 }
 

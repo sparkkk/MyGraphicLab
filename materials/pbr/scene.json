@@ -57,7 +57,8 @@
   ],
   "lights": [
     {
-      "path": "light1.json"
+      "path": "light1.json",
+      "pass": ["default", "lighting"]
     }
   ]
 }

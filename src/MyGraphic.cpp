@@ -135,6 +135,7 @@ protected:
         loader.loadScene(
             "canvas/scene.json",
             mStarter,
+            PASS_DEFAULT,
             mCanvasScene
         );
         mCanvasScene.setCurrentPass(PASS_DEFAULT);

@@ -24,6 +24,7 @@ namespace sunty
         bool loadScene(
             const std::filesystem::path & path,
             const Starter & config,
+            Pass passMask,
             Scene & scene
         );
         bool loadPipeline(

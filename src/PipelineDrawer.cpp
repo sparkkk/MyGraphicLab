@@ -7,16 +7,21 @@ void PipelineDrawer::init(const Starter & config)
 {
 	DescLoader loader;
 	loader.searchPaths.emplace_back("../materials");
-	if (!loader.loadScene(config.scene, config, mScene))
-	{
-		printf("failed to load scene: %s\n", config.scene.c_str());
-		return;
-	}
     if (!loader.loadPipeline(config.pipeline, config, mPipeline))
     {
 		printf("failed to load pipeline: %s\n", config.pipeline.c_str());
         return;
     }
+    Pass passMask = PASS_NONE;
+    for (Pass pass : mPipeline.passes)
+    {
+        passMask = (Pass) (passMask | pass);
+    }
+	if (!loader.loadScene(config.scene, config, passMask, mScene))
+	{
+		printf("failed to load scene: %s\n", config.scene.c_str());
+		return;
+	}
 
     for (Pass pass : mPipeline.passes)
     {

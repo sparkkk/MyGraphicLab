@@ -255,12 +255,14 @@ void from_json(const json& j, JDRenderItem& jd)
 struct JDLightItem
 {
     std::string path;
+    std::vector<std::string> pass;
     std::vector<JDUniformItem> uniforms;
 };
 
 void from_json(const json& j, JDLightItem& jd)
 {
     JD_FROM_JSON(path);
+    JD_FROM_JSON(pass);
     JD_FROM_JSON(uniforms);
 }
 
@@ -285,6 +287,7 @@ void from_json(const json& j, JDScene& jd)
 struct ParseContext
 {
     DescLoader * loader = nullptr;
+    Pass passMask;
     RenderOptions options;
     std::shared_ptr<Shader> shader;
     std::shared_ptr<Mesh> mesh;
@@ -597,6 +600,11 @@ static bool parseMaterial(ParseContext & context, const JDMaterial & jd)
 
 static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
 {
+    Pass pass = parsePass(jd.pass);
+    if ((context.passMask & pass) == 0)
+    {
+        return false;
+    }
     auto & config = context.loader->config;
     float aspect = jd.aspect > 0 ? jd.aspect : (float) config.width / (float) config.height;
 
@@ -615,7 +623,7 @@ static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
             glm::vec3(jd.up[0], jd.up[1], jd.up[2])
         );
         context.cameras.back().flipY = jd.flipY;
-        context.cameras.back().pass = parsePass(jd.pass);
+        context.cameras.back().pass = pass;
         return true;
     }
     else if (jd.type == "ortho")
@@ -633,14 +641,14 @@ static bool parseCameraItem(ParseContext & context, const JDCameraItem & jd)
             glm::vec3(jd.up[0], jd.up[1], jd.up[2])
         );
         context.cameras.back().flipY = jd.flipY;
-        context.cameras.back().pass = parsePass(jd.pass);
+        context.cameras.back().pass = pass;
         return true;
     }
     else if (jd.type == "identity")
     {
         context.cameras.emplace_back();
         context.cameras.back().flipY = jd.flipY;
-        context.cameras.back().pass = parsePass(jd.pass);
+        context.cameras.back().pass = pass;
         return true;
     }
     else
@@ -678,42 +686,54 @@ static bool parseTransformItem(ParseContext & context, const JDTransformItem & j
 
 static bool parseRenderItem(ParseContext & context, const JDRenderItem & jd)
 {
-    context.renders.emplace_back();
-    context.transforms.emplace_back();
-    context.follows.emplace_back(jd.follow);
+    Pass pass = parsePass(jd.pass);
+    if ((context.passMask & pass) == 0)
+    {
+        return false;
+    }
     DescLoader& loader = *context.loader;
     if (jd.path != "")
     {
-        context.renders.back().reset(new RenderObject);
-        auto ptr = std::static_pointer_cast<RenderObject>(context.renders.back());
+        auto ptr = std::make_shared<RenderObject>();
         if (!loader.loadRenderObject(jd.path, *ptr))
         {
             return false;
         }
+        ptr->setPassMask(pass);
+        context.renders.emplace_back(ptr);
+        context.transforms.emplace_back();
+        context.follows.emplace_back(jd.follow);
     }
     else if (jd.group != "")
     {
-        context.renders.back().reset(new RenderGroup);
         auto & jdGroup = context.renderGroupMap[jd.group];
         std::vector<std::shared_ptr<IRenderObject>> subRenders;
         for (auto & item : jdGroup.renders)
         {
-            subRenders.emplace_back(new RenderObject);
-            auto subPtr = std::static_pointer_cast<RenderObject>(subRenders.back());
+            Pass subPass = parsePass(item.pass);
+            if ((context.passMask & subPass) == 0)
+            {
+                continue;
+            }
+            auto subPtr = std::make_shared<RenderObject>();
             if (!loader.loadRenderObject(item.path, *subPtr))
             {
-                return false;
+                continue;
             }
-            subPtr->setPassMask(parsePass(item.pass));
+            subPtr->setPassMask(subPass);
+            subRenders.emplace_back(subPtr);
         }
-        auto ptr = std::static_pointer_cast<RenderGroup>(context.renders.back());
+        auto ptr = std::make_shared<RenderGroup>();
         ptr->setup(subRenders);
+        ptr->setPassMask(pass);
+        context.renders.emplace_back(ptr);
+        context.transforms.emplace_back();
+        context.follows.emplace_back(jd.follow);
     }
     else
     {
         return false;
     }
-    context.renders.back()->setPassMask(parsePass(jd.pass));
     for (auto & item : jd.transforms)
     {
         if (!parseTransformItem(context, item))
@@ -733,18 +753,24 @@ static bool parseRenderItem(ParseContext & context, const JDRenderItem & jd)
 
 static bool parseLightItem(ParseContext & context, const JDLightItem & jd)
 {
+    Pass pass = parsePass(jd.pass);
+    if ((context.passMask & pass) == 0)
+    {
+        return false;
+    }
     context.lights.emplace_back();
     DescLoader& loader = *context.loader;
     if (!loader.loadLight(jd.path, context.lights.back()))
     {
+        context.lights.pop_back();
         return false;
     }
-
+    context.lights.back().pass = pass;
     for (auto & item : jd.uniforms)
     {
         if (!parseUniformItem(context, item))
         {
-            return false;
+            continue;
         }
     }
     return true;
@@ -867,6 +893,7 @@ bool sunty::DescLoader::loadLight(
 bool sunty::DescLoader::loadScene(
 	const std::filesystem::path & path,
     const Starter & config,
+    Pass passMask,
     Scene & scene)
 {
     auto asbPath = assembllyPath(path);
@@ -883,6 +910,7 @@ bool sunty::DescLoader::loadScene(
     ParseContext context;
 
     context.loader = this;
+    context.passMask = passMask;
 
     json json;
 
@@ -894,7 +922,7 @@ bool sunty::DescLoader::loadScene(
     {
         if (!parseCameraItem(context, item))
         {
-            return false;
+            continue;
         }
     }
     for (auto & item : jdScene.renderGroups)
@@ -905,14 +933,14 @@ bool sunty::DescLoader::loadScene(
     {
         if (!parseRenderItem(context, item))
         {
-            return false;
+            continue;
         }
         auto uniforms = std::move(context.uniforms);
+        context.renders.back()->setCurrentPass(context.renders.back()->getPassMask());
         for (auto & entry : uniforms)
         {
             auto & id = entry.first;
             auto & value = entry.second;
-            context.renders.back()->setCurrentPass(context.renders.back()->getPassMask());
             context.renders.back()->setParam(id.c_str(), value);
         }
     }
@@ -920,7 +948,7 @@ bool sunty::DescLoader::loadScene(
     {
         if (!parseLightItem(context, item))
         {
-            return false;
+            continue;
         }
         auto uniforms = std::move(context.uniforms);
         for (auto & entry : uniforms)

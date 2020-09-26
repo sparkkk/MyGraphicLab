@@ -15,6 +15,7 @@ namespace sunty
                 TYPE_POINT,
             };
             Type type;
+            Pass pass = PASS_NONE;
             std::unordered_map<std::string, UniformValue> uniforms;
         };
         struct Transform
