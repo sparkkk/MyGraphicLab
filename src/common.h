@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include <string.h>
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <string>
 #include <vector>
 #include <map>

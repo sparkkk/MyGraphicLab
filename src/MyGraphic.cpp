@@ -1,7 +1,7 @@
 // MyGraphic.cpp : Defines the entry point for the console application.
 //
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <math.h>
 
@@ -75,10 +75,9 @@ protected:
         glfwSetWindowSizeCallback(mWindow, window_size_callback);
         glfwSwapInterval(0);
 
-        GLenum err = glewInit();
-        if (err != GLEW_OK)
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
-            printf("glewInit failed: %u\n", err);
+            printf("Failed to initialize GLAD\n");
             return false;
         }
         return true;
@@ -213,8 +212,8 @@ protected:
     void checkError()
     {
         auto err = glGetError();
-        auto errStr = glewGetErrorString(err);
-        printf("%s\n", errStr);
+
+        printf("GL Error %x\n", err);
     }
 public:
     Starter mStarter;
